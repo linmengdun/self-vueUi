@@ -1,0 +1,13 @@
+#import "./projectFragment.gql"
+
+query projects($skip: Int, $limit: Int) {
+  projects(skip: $skip, limit: $limit) {
+    total
+    data{
+      ...project
+    },
+    allData{
+      ...project
+    }
+  }
+}
