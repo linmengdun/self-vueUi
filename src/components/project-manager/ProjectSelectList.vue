@@ -34,7 +34,7 @@
               <!-- 收藏项目 begin -->
               <ListFilter :list="favoriteProjects(data.projects.allData)" :filter="item => true">
                 <template slot-scope="{ list }">
-                  <template v-if="list">
+                  <template v-if="list.length > 0">
                     <div class="cta-text favorite">
                       {{ $t(`org.vue.components.project-select-list.titles.favorite`) }}
                     </div>
@@ -54,7 +54,7 @@
               <!-- 其他项目 begin -->
               <ListFilter :list="otherList(data.projects.data)" :filter="item => true">
                 <template slot-scope="{ list }">
-                  <template v-if="list">
+                  <template v-if="list.length > 0">
                     <div class="cta-text other">
                       {{ $t(`org.vue.components.project-select-list.titles.other`) }}
                     </div>

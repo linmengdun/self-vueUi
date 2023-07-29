@@ -1,0 +1,5 @@
+fragment taskHistory on TaskHistory {
+  id
+  status
+  homepage
+}

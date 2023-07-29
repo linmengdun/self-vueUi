@@ -20,4 +20,5 @@ fragment prompt on Prompt {
     ...promptError
   }
   tabId
+  taskId
 }

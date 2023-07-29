@@ -1,37 +1,16 @@
 <template>
   <div class="project-configurations page">
-    <ContentView
-      :title="$t('org.vue.views.project-configurations.title')"
-      class="limit-width"
-    >
+    <ContentView :title="$t('org.vue.views.project-configurations.title')" class="limit-width">
       <template slot="actions">
-        <VueInput
-          v-model="search"
-          icon-left="search"
-          class="round"
-        />
+        <VueInput v-model="search" icon-left="search" class="round" />
       </template>
 
-      <ApolloQuery
-        :query="require('../graphql/configurations.gql')"
-        class="fill-height"
-      >
+      <ApolloQuery :query="require('../graphql/configurations.gql')" class="fill-height">
         <template slot-scope="{ result: { data, loading } }">
-          <VueLoadingIndicator
-            v-if="loading && (!data || !data.configurations)"
-            class="overlay"
-          />
+          <VueLoadingIndicator v-if="loading && (!data || !data.configurations)" class="overlay" />
 
-          <NavContent
-            v-else-if="data"
-            :items="generateItems(data.configurations)"
-            class="configurations"
-          >
-            <ConfigurationItem
-              slot-scope="{ item, selected }"
-              :configuration="item.configuration"
-              :selected="selected"
-            />
+          <NavContent v-else-if="data" :items="generateItems(data.configurations)" class="configurations">
+            <ConfigurationItem slot-scope="{ item, selected }" :configuration="item.configuration" :selected="selected" />
           </NavContent>
         </template>
       </ApolloQuery>
@@ -52,20 +31,20 @@ export default {
     })
   ],
 
-  metaInfo () {
+  metaInfo() {
     return {
       title: this.$t('org.vue.views.project-configurations.title')
     }
   },
 
-  data () {
+  data() {
     return {
       search: ''
     }
   },
 
   bus: {
-    quickOpenProject (project) {
+    quickOpenProject(project) {
       this.$apollo.getClient().writeQuery({
         query: CONFIGS,
         data: {
@@ -76,7 +55,7 @@ export default {
   },
 
   methods: {
-    generateItems (configurations) {
+    generateItems(configurations) {
       if (!configurations) return []
 
       const reg = generateSearchRegex(this.search)

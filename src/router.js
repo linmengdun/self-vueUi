@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import db from './util/db'
 import { apolloClient } from './vue-apollo'
 
-import ProjectHome from './views/ProjectHome.vue'
+import ProjectHome from '@/components/app/ProjectHome.vue'
 
 /* import ProjectDashboard from './components/dashboard/ProjectDashboard.vue'
 import ProjectPlugins from './components/plugin/ProjectPlugins.vue' */

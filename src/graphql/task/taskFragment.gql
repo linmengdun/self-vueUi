@@ -5,10 +5,7 @@ fragment task on Task {
   command
   description
   icon
-  plugin {
-    id
-    logo
-  }
+  needHistory
   project {
     id
   }

@@ -1,30 +1,19 @@
 <template>
-  <div
-    class="project-nav"
-    :class="{
-      wide: $responsive.wide
-    }"
-  >
-    <div class="header">
+  <div class="project-nav" :class="{
+    wide: $responsive.wide
+  }">
+    <!-- <div class="header">
       <ProjectQuickDropdown/>
-    </div>
+    </div> -->
 
     <div class="content">
-      <VueGroup
-        v-model="currentViewName"
-        class="vertical small-indicator left-indicator primary"
-        indicator
-      >
+      <VueGroup v-model="currentViewName" class="vertical small-indicator left-indicator primary" indicator>
         <template v-for="view of views">
-          <ViewNavButton
-            v-if="hasProjectType(view)"
-            :key="view.id"
-            :view="view"
-          />
+          <ViewNavButton v-if="hasProjectType(view)" :key="view.id" :view="view" />
         </template>
       </VueGroup>
 
-      <ViewNavMore/>
+      <ViewNavMore />
     </div>
   </div>
 </template>
@@ -38,9 +27,9 @@ import VIEW_ADDED from '@/graphql/view/viewAdded.gql'
 import VIEW_REMOVED from '@/graphql/view/viewRemoved.gql'
 import VIEW_CHANGED from '@/graphql/view/viewChanged.gql'
 import VIEW_OPEN from '@/graphql/view/viewOpen.gql'
-
+/* eslint-disable */
 export default {
-  data () {
+  data() {
     return {
       views: []
     }
@@ -106,7 +95,7 @@ export default {
   },
 
   computed: {
-    currentView () {
+    currentView() {
       const currentRoute = this.$route
       return this.views.find(
         item => isIncludedRoute(currentRoute, this.$router.resolve({ name: item.name }).route)
@@ -114,11 +103,11 @@ export default {
     },
 
     currentViewName: {
-      get () {
+      get() {
         const view = this.currentView
         return view && view.name
       },
-      set (name) {
+      set(name) {
         if (!isSameRoute(this.$route, this.$router.resolve({ name }).route)) {
           this.$router.push({ name })
         }
@@ -128,7 +117,7 @@ export default {
 
   watch: {
     currentView: {
-      handler (value, oldValue) {
+      handler(value, oldValue) {
         if (!value) return
         if (oldValue && value.id === oldValue.id) return
 
@@ -150,12 +139,12 @@ export default {
   },
 
   methods: {
-    hasProjectType (view) {
+    hasProjectType(view) {
       return (!view.projectTypes && this.projectCurrent.type === 'vue') ||
         (view.projectTypes && view.projectTypes.includes(this.projectCurrent.type))
     },
 
-    checkProjectType () {
+    checkProjectType() {
       if (!this.currentView) return
 
       if (!this.hasProjectType(this.currentView)) {

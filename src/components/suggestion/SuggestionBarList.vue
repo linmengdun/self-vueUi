@@ -1,16 +1,12 @@
 <template>
   <transition-group name="suggestion" class="suggestions">
-    <SuggestionBarItem
-      v-for="(suggestion, index) of suggestions"
-      :key="`${$i18n.locale}:${suggestion.id}`"
-      :suggestion="suggestion"
-      :index="suggestions.length - index - 1"
-      ping
-    />
+    <SuggestionBarItem v-for="(suggestion, index) of suggestions" :key="`${$i18n.locale}:${suggestion.id}`"
+      :suggestion="suggestion" :index="suggestions.length - index - 1" ping />
   </transition-group>
 </template>
 
 <script>
+/* eslint-disable */
 export default {
   props: {
     suggestions: {

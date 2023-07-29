@@ -1,4 +1,5 @@
 #import "./taskFragment.gql"
+#import "./taskHistoryFragment.gql"
 #import "../prompt/promptFragment.gql"
 
 query task ($id: ID!) {
@@ -13,6 +14,9 @@ query task ($id: ID!) {
       label
       icon
       component
+    }
+    history {
+      ...taskHistory
     }
     defaultView
   }

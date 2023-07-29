@@ -1,70 +1,38 @@
 <template>
   <div class="project-plugins page">
-    <ContentView
-      :title="$t('org.vue.views.project-plugins.title')"
-      class="limit-width"
-    >
+    <ContentView :title="$t('org.vue.views.project-plugins.title')" class="limit-width">
       <template slot="actions">
-        <VueInput
-          v-model="search"
-          icon-left="search"
-          class="round"
-        />
+        <VueInput v-model="search" icon-left="search" class="round" />
 
-        <VueButton
-          icon-left="add"
-          :label="$t('org.vue.views.project-plugins.button')"
-          class="primary round"
-          :to="{ name: 'project-plugins-add' }"
-          data-testid="add-plugin"
-        />
+        <VueButton icon-left="add" :label="$t('org.vue.views.project-plugins.button')" class="primary round"
+          :to="{ name: 'project-plugins-add' }" data-testid="add-plugin" />
 
         <VueDropdown>
-          <VueButton
-            slot="trigger"
-            icon-left="more_vert"
-            class="icon-button flat round"
-          />
+          <VueButton slot="trigger" icon-left="more_vert" class="icon-button flat round" />
 
-          <VueDropdownButton
-            icon-left="file_download"
-            :label="$t('org.vue.views.project-plugins.update-all')"
-            @click="updateAll()"
-          />
+          <VueDropdownButton icon-left="file_download" :label="$t('org.vue.views.project-plugins.update-all')"
+            @click="updateAll()" />
         </VueDropdown>
       </template>
 
-      <ApolloQuery
-        :query="require('../graphql/plugins.gql')"
-      >
+      <ApolloQuery :query="require('../graphql/plugins.gql')">
         <template slot-scope="{ result: { data, loading } }">
           <div class="cta-text">{{ $t('org.vue.views.project-plugins.heading') }}</div>
 
-          <VueLoadingIndicator
-            v-if="loading && (!data || !data.plugins)"
-            class="overlay"
-          />
+          <VueLoadingIndicator v-if="loading && (!data || !data.plugins)" class="overlay" />
 
-          <ListFilter
-            v-else-if="data"
-            class="plugins"
-            :list="data.plugins"
-            :filter="item => !search || item.id.includes(search)"
-          >
+          <ListFilter v-else-if="data" class="plugins" :list="data.plugins"
+            :filter="item => !search || item.id.includes(search)">
             <template slot-scope="{ list }">
-              <ProjectPluginItem
-                v-for="plugin of list"
-                :key="plugin.id"
-                :plugin="plugin"
-              />
+              <ProjectPluginItem v-for="plugin of list" :key="plugin.id" :plugin="plugin" />
             </template>
           </ListFilter>
         </template>
       </ApolloQuery>
     </ContentView>
 
-    <ProgressScreen progress-id="plugin-update"/>
-    <ProgressScreen progress-id="plugins-update"/>
+    <ProgressScreen progress-id="plugin-update" />
+    <ProgressScreen progress-id="plugins-update" />
   </div>
 </template>
 
@@ -76,13 +44,13 @@ import PLUGINS from '../graphql/plugins.gql'
 export default {
   name: 'ProjectPlugins',
 
-  metaInfo () {
+  metaInfo() {
     return {
       title: this.$t('org.vue.views.project-plugins.title')
     }
   },
 
-  data () {
+  data() {
     return {
       search: ''
     }
@@ -93,7 +61,7 @@ export default {
   },
 
   bus: {
-    quickOpenProject (project) {
+    quickOpenProject(project) {
       this.$apollo.getClient().writeQuery({
         query: PLUGINS,
         data: {
@@ -104,7 +72,7 @@ export default {
   },
 
   methods: {
-    updateAll () {
+    updateAll() {
       return this.$apollo.mutate({
         mutation: PLUGINS_UPDATE
       })

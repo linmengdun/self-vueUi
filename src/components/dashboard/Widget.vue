@@ -1,21 +1,14 @@
 <template>
   <transition duration="150" appear>
-    <div
-      class="widget"
-      :class="{
-        customizing: customizeMode,
-        moving: moveState,
-        resizing: resizeState,
-        selected: isSelected,
-        'details-shown': showDetails,
-        details
-      }"
-    >
-      <div
-        ref="shell"
-        class="shell"
-        :style="shellStyle || (!details && mainStyle)"
-      >
+    <div class="widget" :class="{
+      customizing: customizeMode,
+      moving: moveState,
+      resizing: resizeState,
+      selected: isSelected,
+      'details-shown': showDetails,
+      details
+    }">
+      <div ref="shell" class="shell" :style="shellStyle || (!details && mainStyle)">
         <div class="wrapper card">
           <div class="content-wrapper">
             <div class="header">
@@ -23,150 +16,74 @@
 
               <!-- Custom actions -->
               <template v-if="widget.configured">
-                <VueButton
-                  v-for="action of visibleHeaderActions"
-                  :key="action.id"
-                  :icon-left="action.icon"
-                  :disabled="action.disabled"
-                  class="icon-button flat primary"
-                  v-tooltip="$t(action.tooltip)"
-                  @click="action.onCalled()"
-                />
+                <VueButton v-for="action of visibleHeaderActions" :key="action.id" :icon-left="action.icon"
+                  :disabled="action.disabled" class="icon-button flat primary" v-tooltip="$t(action.tooltip)"
+                  @click="action.onCalled()" />
               </template>
 
               <!-- Settings button -->
-              <VueButton
-                v-if="widget.definition.hasConfigPrompts"
-                icon-left="settings"
-                class="icon-button flat primary"
-                v-tooltip="$t('org.vue.components.widget.configure')"
-                @click="openConfig()"
-              />
+              <VueButton v-if="widget.definition.hasConfigPrompts" icon-left="settings" class="icon-button flat primary"
+                v-tooltip="$t('org.vue.components.widget.configure')" @click="openConfig()" />
 
               <!-- Close button -->
-              <VueButton
-                v-if="details"
-                icon-left="close"
-                class="icon-button flat primary"
-                @click="$emit('close')"
-              />
+              <VueButton v-if="details" icon-left="close" class="icon-button flat primary" @click="$emit('close')" />
 
               <!-- Open details button -->
-              <VueButton
-                v-else-if="widget.definition.openDetailsButton"
-                icon-left="zoom_out_map"
-                class="icon-button flat primary"
-                v-tooltip="$t('org.vue.components.widget.open-details')"
-                @click="openDetails()"
-              />
+              <VueButton v-else-if="widget.definition.openDetailsButton" icon-left="zoom_out_map"
+                class="icon-button flat primary" v-tooltip="$t('org.vue.components.widget.open-details')"
+                @click="openDetails()" />
             </div>
 
             <div v-if="widget.configured" class="content">
-              <ClientAddonComponent
-                :name="component"
-                class="view"
-              />
+              <ClientAddonComponent :name="component" class="view" />
             </div>
 
             <div v-else class="content not-configured">
-              <VueIcon
-                icon="settings"
-                class="icon huge"
-              />
-              <VueButton
-                :label="$t('org.vue.components.widget.configure')"
-                @click="openConfig()"
-              />
+              <VueIcon icon="settings" class="icon huge" />
+              <VueButton :label="$t('org.vue.components.widget.configure')" @click="openConfig()" />
             </div>
           </div>
 
-          <div
-            v-if="customizeMode"
-            class="customize-overlay"
-            @mousedown="onMoveStart"
-            @click="select()"
-          >
+          <div v-if="customizeMode" class="customize-overlay" @mousedown="onMoveStart" @click="select()">
             <div class="definition-chip">
-              <ItemLogo
-                :image="widget.definition.icon"
-                fallback-icon="widgets"
-                class="icon"
-              />
+              <ItemLogo :image="widget.definition.icon" fallback-icon="widgets" class="icon" />
               <div class="title">{{ injected.customTitle || $t(widget.definition.title) }}</div>
             </div>
-            <VueButton
-              class="remove-button primary flat icon-button"
-              icon-left="close"
-              v-tooltip="$t('org.vue.components.widget.remove')"
-              @mousedown.native.stop
-              @click.stop="remove()"
-            />
+            <VueButton class="remove-button primary flat icon-button" icon-left="close"
+              v-tooltip="$t('org.vue.components.widget.remove')" @mousedown.native.stop @click.stop="remove()" />
 
             <template v-if="showResizeHandle">
-              <div
-                v-for="handle of resizeHandles"
-                :key="handle"
-                class="resize-handle"
-                :class="[
-                  handle
-                ]"
-                @mousedown.stop="onResizeStart($event, handle)"
-              />
+              <div v-for="handle of resizeHandles" :key="handle" class="resize-handle" :class="[
+                handle
+              ]" @mousedown.stop="onResizeStart($event, handle)" />
             </template>
           </div>
         </div>
       </div>
 
-      <div
-        v-if="moveState"
-        class="move-ghost"
-        :style="moveGhostStyle"
-      >
-        <div class="backdrop"/>
+      <div v-if="moveState" class="move-ghost" :style="moveGhostStyle">
+        <div class="backdrop" />
       </div>
 
-      <div
-        v-if="resizeState"
-        class="resize-ghost"
-        :style="resizeGhostStyle"
-      >
-        <div class="backdrop"/>
+      <div v-if="resizeState" class="resize-ghost" :style="resizeGhostStyle">
+        <div class="backdrop" />
       </div>
 
-      <VueModal
-        v-if="showConfig"
-        :title="$t('org.vue.components.widget.configure')"
-        class="medium"
-        @close="showConfig = false"
-      >
+      <VueModal v-if="showConfig" :title="$t('org.vue.components.widget.configure')" class="medium"
+        @close="showConfig = false">
         <div class="default-body">
-          <VueLoadingIndicator
-            v-if="loadingConfig"
-            class="big accent"
-          />
-          <PromptsList
-            v-else
-            :prompts="visiblePrompts"
-            @answer="answerPrompt"
-          />
+          <VueLoadingIndicator v-if="loadingConfig" class="big accent" />
+          <PromptsList v-else :prompts="visiblePrompts" @answer="answerPrompt" />
         </div>
 
         <div slot="footer" class="actions">
-          <VueButton
-            class="primary big"
-            :label="$t('org.vue.components.widget.save')"
-            :disabled="loadingConfig"
-            @click="saveConfig()"
-          />
+          <VueButton class="primary big" :label="$t('org.vue.components.widget.save')" :disabled="loadingConfig"
+            @click="saveConfig()" />
         </div>
       </VueModal>
 
-      <WidgetDetailsView
-        v-if="!details && showDetails"
-        :widget="widget"
-        :shell-origin="shellOrigin"
-        @close="closeDetails()"
-      />
+      <WidgetDetailsView v-if="!details && showDetails" :widget="widget" :shell-origin="shellOrigin"
+        @close="closeDetails()" />
     </div>
   </transition>
 </template>
@@ -194,9 +111,9 @@ const state = new Vue({
     selectedWidgetId: null
   }
 })
-
+/* eslint-disable */
 export default {
-  provide () {
+  provide() {
     return {
       widget: this.injected
     }
@@ -209,7 +126,7 @@ export default {
   mixins: [
     Prompts({
       field: 'widget',
-      update (store, prompts) {
+      update(store, prompts) {
         store.writeFragment({
           fragment: WIDGET_FRAGMENT,
           fragmentName: 'widget',
@@ -261,7 +178,7 @@ export default {
     }
   },
 
-  data () {
+  data() {
     return {
       showConfig: false,
       loadingConfig: false,
@@ -286,30 +203,30 @@ export default {
   },
 
   computed: {
-    isSelected () {
+    isSelected() {
       return this.widget.id === state.selectedWidgetId
     },
 
-    component () {
+    component() {
       if (this.details) {
         return this.widget.definition.detailsComponent
       }
       return this.widget.definition.component
     },
 
-    visibleHeaderActions () {
+    visibleHeaderActions() {
       return this.headerActions.filter(action => !action.hidden)
     }
   },
 
   watch: {
     widget: {
-      handler (value) {
+      handler(value) {
         this.injected.data = value
       }
     },
 
-    customizeMode (value) {
+    customizeMode(value) {
       if (value) {
         if (this.showDetails) this.closeDetails()
       } else if (this.isSelected) {
@@ -325,7 +242,7 @@ export default {
     'widget.height': 'updateShellOrigin'
   },
 
-  mounted () {
+  mounted() {
     // Wait for animation
     setTimeout(() => {
       this.updateShellOrigin()
@@ -333,7 +250,7 @@ export default {
   },
 
   methods: {
-    async openConfig () {
+    async openConfig() {
       this.loadingConfig = true
       this.showConfig = true
       await this.$apollo.mutate({
@@ -345,7 +262,7 @@ export default {
       this.loadingConfig = false
     },
 
-    async saveConfig () {
+    async saveConfig() {
       this.showConfig = false
       this.loadingConfig = false
       await this.$apollo.mutate({
@@ -356,19 +273,19 @@ export default {
       })
     },
 
-    openDetails () {
+    openDetails() {
       if (this.widget.definition.detailsComponent) {
         this.showDetails = true
         this.dashboard.isWidgetDetailsShown = true
       }
     },
 
-    closeDetails () {
+    closeDetails() {
       this.showDetails = false
       this.dashboard.isWidgetDetailsShown = false
     },
 
-    remove () {
+    remove() {
       this.$apollo.mutate({
         mutation: WIDGET_REMOVE,
         variables: {
@@ -391,11 +308,11 @@ export default {
       })
     },
 
-    select () {
+    select() {
       state.selectedWidgetId = this.widget.id
     },
 
-    async onMoved () {
+    async onMoved() {
       await this.$apollo.mutate({
         mutation: WIDGET_MOVE,
         variables: {
@@ -410,7 +327,7 @@ export default {
       })
     },
 
-    async onResized () {
+    async onResized() {
       await this.$apollo.mutate({
         mutation: WIDGET_MOVE,
         variables: {
@@ -425,7 +342,7 @@ export default {
       })
     },
 
-    updateShellOrigin () {
+    updateShellOrigin() {
       const el = this.$refs.shell
       if (!el) return
       const bounds = el.getBoundingClientRect()
@@ -435,7 +352,7 @@ export default {
       }
     },
 
-    addHeaderAction (action) {
+    addHeaderAction(action) {
       this.removeHeaderAction(action.id)
       // Optional props should still be reactive
       if (!action.tooltip) action.tooltip = null
@@ -448,14 +365,14 @@ export default {
       this.headerActions.push(action)
     },
 
-    removeHeaderAction (id) {
+    removeHeaderAction(id) {
       const index = this.headerActions.findIndex(a => a.id === id)
       if (index !== -1) this.headerActions.splice(index, 1)
     }
   }
 }
 
-function transformToGetter (obj, field) {
+function transformToGetter(obj, field) {
   const value = obj[field]
   if (typeof value === 'function') {
     delete obj[field]
