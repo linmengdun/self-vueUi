@@ -1,0 +1,3 @@
+mutation branchCheckout ($input: BranchCheckoutInput!) {
+  branchCheckout (input: $input)
+}

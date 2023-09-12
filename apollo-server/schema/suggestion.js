@@ -28,6 +28,7 @@ type Suggestion {
   link: String
   actionLink: String
   busy: Boolean!
+  image: String
 }
 
 enum SuggestionType {

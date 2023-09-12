@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const hash = require('hash-sum')
 const { remove: removeDir, pathExists: exists } = require('fs-extra')
+const _ = require('lodash')
 const { defaults } = require('@vue/cli/lib/options')
 const { execa } = require('@vue/cli-shared-utils')
 // Connectors
@@ -38,14 +39,6 @@ let cache = {
 
 function list(context, root, args) {
 
-  // 由于初始化会执行两次，所以判断limit不存在则直接返回默认
-  if (!args.limit) {
-    return {
-      total: 0,
-      data: []
-    }
-  }
-
   const pageNumber = args.skip || 1 // 默认显示第一页
   const pageSize = args.limit || 50 // 默认每页显示 50 条数据
   const startIndex = (pageNumber - 1) * pageSize
@@ -59,9 +52,11 @@ function list(context, root, args) {
     cache.cacheNeedsRefresh = false
   }
 
+  // 去重
+  /* cache.data = _.uniqBy(cache.data, 'id'); */
+
   refreshCacheInfo(cache.data, pageSize)
   rows = cache.data.slice(startIndex, endIndex)
-
   return {
     total: cache.totalPages,
     data: rows,
@@ -310,7 +305,7 @@ async function create(input, context) {
 
 async function importProject({ repo }, context) {
   if (context.db.get('projects').find({ repo }).value()) {
-    throw new Error(`${repo} already exists`)
+    return new Error(`${repo} already exists`)
   }
 
   return progress.wrap(repo, context, async setProgress => {
@@ -364,13 +359,15 @@ async function importProject({ repo }, context) {
     project.name = packageData.name
 
     context.db.get('projects').push(project).write()
+    // 更新缓存
+    cache.data.push(project)
+
     return open(project.id, context)
   })
 }
 
 async function open(id, context) {
   const project = findOne(id, context)
-
   if (!project) {
     log('Project not found', id)
     return null
@@ -391,6 +388,13 @@ async function open(id, context) {
   context.db.get('projects').find({ id }).assign({
     openDate: Date.now()
   }).write()
+  // 更新缓存openDate日期
+  for (let i = 0, len = cache.data.length; i < len; i++) {
+    if (cache.data[i].id === id) {
+      cache.data[i] = project
+      break
+    }
+  }
 
   log('Project open', id, project.path)
 
@@ -400,6 +404,17 @@ async function open(id, context) {
 async function remove(id, context) {
   await removeDir(context.db.get('projects').find({ id }).value().path)
   context.db.get('projects').remove({ id }).write()
+
+  // 移除缓存
+  let cacheData = cache.data
+  for (let i = 0, len = cacheData.length; i < len; i++) {
+    const element = cacheData[i];
+    if (element.id === id) {
+      cacheData.splice(i, 1)
+      break
+    }
+  }
+
   return true
 }
 

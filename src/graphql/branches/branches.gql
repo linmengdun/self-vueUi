@@ -1,0 +1,7 @@
+#import "./branchFragment.gql"
+
+query branches ($projectId: ID!) {
+  branches(projectId: $projectId) {
+    ...branch
+  }
+}

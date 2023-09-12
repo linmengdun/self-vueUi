@@ -1,0 +1,4 @@
+fragment branch on Branch {
+  name
+  current
+}

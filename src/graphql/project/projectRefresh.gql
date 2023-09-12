@@ -1,0 +1,3 @@
+mutation projectRefresh ($id: ID!) {
+  projectRefresh (id: $id)
+}

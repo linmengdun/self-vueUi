@@ -3,14 +3,12 @@
     wide: $responsive.wide
   }">
     <!-- <div class="header">
-      <ProjectQuickDropdown/>
+      <ProjectQuickDropdown />
     </div> -->
 
     <div class="content">
       <VueGroup v-model="currentViewName" class="vertical small-indicator left-indicator primary" indicator>
-        <template v-for="view of views">
-          <ViewNavButton v-if="hasProjectType(view)" :key="view.id" :view="view" />
-        </template>
+        <ViewNavButton v-for="view of views" :key="view.id" :view="view" />
       </VueGroup>
 
       <ViewNavMore />
@@ -140,13 +138,12 @@ export default {
 
   methods: {
     hasProjectType(view) {
-      return (!view.projectTypes && this.projectCurrent.type === 'vue') ||
+      return (!view.projectTypes && this.projectCurrent?.type === 'vue') ||
         (view.projectTypes && view.projectTypes.includes(this.projectCurrent.type))
     },
 
     checkProjectType() {
       if (!this.currentView) return
-
       if (!this.hasProjectType(this.currentView)) {
         const view = this.views.find(v => this.hasProjectType(v))
         if (view) {

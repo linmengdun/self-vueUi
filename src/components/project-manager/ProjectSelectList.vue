@@ -1,7 +1,7 @@
 <template>
   <div class="project-select-list">
-    <ApolloQuery :query="require('@/graphql/project/projects.gql')" :variables="{ skip: skip, limit: 50 }"
-      fetch-policy="network-only">
+    <ApolloQuery :query="require('@/graphql/project/projects.gql')"
+      :variables="{ skip: skip, limit: 50, forceRerender: forceRerender }" fetch-policy="network-only">
       <template slot-scope="{ result: { data, loading } }">
         <template v-if="data && data.projects">
           <div v-if="data.projects.data.length">
@@ -17,7 +17,6 @@
                   <div v-if="favoriteProjects.length" class="cta-text" :class="favorite ? 'favorite' : 'other'">
                     {{ $t(`org.vue.components.project-select-list.titles.${favorite ? 'favorite' : 'other'}`) }}
                   </div>
-
                   <ListSort :list="list" :compare="compareProjects">
                     <template slot-scope="{ list }">
                       <ProjectSelectListItem v-for="project of list" :key="project.id" :project="project" :class="{
@@ -111,7 +110,7 @@ import Lowdb from '@/mixins/Lowdb'
 import CurrentProject from '@/mixins/CurrentProject'
 import { generateSearchRegex } from '@/util/search'
 
-import PROJECTS from '@/graphql/project/projects.gql'
+/* import PROJECTS from '@/graphql/project/projects.gql' */
 import PROJECT_OPEN from '@/graphql/project/projectOpen.gql'
 import PROJECT_REMOVE from '@/graphql/project/projectRemove.gql'
 // import PROJECT_SET_FAVORITE from '../graphql/projectSetFavorite.gql'
@@ -127,7 +126,8 @@ export default {
       showDelete: false, // projectid / removing status
       favoriteProjectIds: [],
       search: '',
-      skip: 1
+      skip: 1,
+      forceRerender: 0,
     }
   },
 
@@ -137,9 +137,9 @@ export default {
       .value()
   },
 
-  apollo: {
+  /* apollo: {
     projects: PROJECTS
-  },
+  }, */
 
   methods: {
     favoriteProjects(projects) {
@@ -180,7 +180,9 @@ export default {
       })
 
       this.showDelete = false
-      this.$apollo.queries.projects.refetch()
+      //this.$apollo.queries.projects.refetch();
+      // 通过这种方式重新触发数据更新，其他update方式不生效，有可能是因为内部被我们重写的缘故
+      this.forceRerender += 1;
     },
 
     async toggleFavorite(project) {

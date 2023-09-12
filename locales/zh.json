@@ -4,7 +4,7 @@
       "components": {
         "connection-status": {
           "disconnected": "连接已断开",
-          "connected": "已连接 ewan 项目管理器!"
+          "connected": "已连接 E-world 项目管理器!"
         },
         "file-diff": {
           "binary": "二进制文件",
@@ -155,7 +155,7 @@
             "tooltip": "当前目录"
           },
           "log": {
-            "tooltip": "日志,点击显示／隐藏 Ewan CLI 日志",
+            "tooltip": "日志,点击显示／隐藏 E-world CLI 日志",
             "empty": "（暂无日志）"
           },
           "report-bug": "反馈 bug",
@@ -226,7 +226,7 @@
       },
       "views": {
         "project-select": {
-          "title": "Ewan 项目管理系统",
+          "title": "E-World 项目管理系统",
           "tabs": {
             "projects": "项目",
             "create": "创建",
@@ -447,7 +447,7 @@
         "about": {
           "title": "关于",
           "description": "<a href=\"https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-ui\" target=\"_blank\">@vue/cli-ui</a> is a built-in package of vue-cli which opens a full-blown UI.",
-          "quote": "Ewan 3.x is a complete rewrite, with a lot of new awesome features. You will be to select features like routing, Ewanx or Typescript, then add and upgrade building blocks called \"vue-cli plugins\". But having so much more options also means the tool is now more complex and harder to start using. That's why we thought having a full-blown GUI would help discover the new features, search and install vue-cli plugins and unlock more possibilities overall while not being limited by a terminal interface. To sum up, vue-cli will not only allow you to bootstrap a new project easily, but it will also remain useful for ongoing work afterwards!",
+          "quote": "E-world 3.x is a complete rewrite, with a lot of new awesome features. You will be to select features like routing, E-worldx or Typescript, then add and upgrade building blocks called \"vue-cli plugins\". But having so much more options also means the tool is now more complex and harder to start using. That's why we thought having a full-blown GUI would help discover the new features, search and install vue-cli plugins and unlock more possibilities overall while not being limited by a terminal interface. To sum up, vue-cli will not only allow you to bootstrap a new project easily, but it will also remain useful for ongoing work afterwards!",
           "links": "资源链接",
           "back": "返回"
         }
@@ -464,7 +464,7 @@
           },
           "vue-devtools": {
             "label": "安装 devtools",
-            "message": "Browser devtools official extension for debugging Ewan.js applications where you can inspect your components, vuex store and events."
+            "message": "Browser devtools official extension for debugging E-world.js applications where you can inspect your components, vuex store and events."
           },
           "progress": "正在安装 {arg0}..."
         }
@@ -564,7 +564,7 @@
         },
         "config": {
           "vue-cli": {
-            "description": "配置 Ewan 项目",
+            "description": "配置 E-world 项目",
             "groups": {
               "general": "基础设置",
               "css": "CSS 设置"
@@ -583,7 +583,7 @@
             },
             "runtimeCompiler": {
               "label": "Enable runtime compiler",
-              "description": "This will allow you to use the template option in Ewan components, but will incur around an extra 10kb payload for your app."
+              "description": "This will allow you to use the template option in E-world components, but will incur around an extra 10kb payload for your app."
             },
             "productionSourceMap": {
               "label": "Enable Production Source Maps",
@@ -622,7 +622,7 @@
               "recommended": "推荐"
             },
             "vue": {
-              "label": "Ewan"
+              "label": "E-world"
             },
             "extra": {
               "label": "更多设置",

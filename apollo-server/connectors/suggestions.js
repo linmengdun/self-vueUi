@@ -5,15 +5,15 @@ const { log } = require('../util/logger')
 
 const suggestions = []
 
-function list (context) {
+function list(context) {
   return suggestions
 }
 
-function findOne (id) {
+function findOne(id) {
   return suggestions.find(s => s.id === id)
 }
 
-function add (suggestion, context) {
+function add(suggestion, context) {
   if (findOne(suggestion.id)) return
 
   if (!suggestion.importance) {
@@ -32,7 +32,7 @@ function add (suggestion, context) {
   return suggestion
 }
 
-function remove (id, context) {
+function remove(id, context) {
   const suggestion = findOne(id)
   if (!suggestion) return
   const index = suggestions.indexOf(suggestion)
@@ -47,13 +47,13 @@ function remove (id, context) {
   return suggestion
 }
 
-function clear (context) {
+function clear(context) {
   for (const suggestion of suggestions) {
     remove(suggestion.id, context)
   }
 }
 
-function update (data, context) {
+function update(data, context) {
   const suggestion = findOne(data.id)
   if (!suggestion) return
   Object.assign(suggestion, data)
@@ -67,7 +67,7 @@ function update (data, context) {
   return suggestion
 }
 
-async function activate ({ id }, context) {
+async function activate({ id }, context) {
   const suggestion = findOne(id)
   if (!suggestion) return
 

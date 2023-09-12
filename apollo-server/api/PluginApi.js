@@ -4,6 +4,7 @@ const logs = require('../connectors/logs')
 const sharedData = require('../connectors/shared-data')
 const views = require('../connectors/views')
 const suggestions = require('../connectors/suggestions')
+const folders = require('../connectors/folders')
 const progress = require('../connectors/progress')
 // Utils
 const ipc = require('../util/ipc')
@@ -393,6 +394,11 @@ class PluginApi {
    * @param {string} id Plugin id or short id
    */
   hasPlugin(id) {
+    if (id === 'router') id = 'vue-router'
+    if (['vue-router', 'vuex'].includes(id)) {
+      const pkg = folders.readPackage(this.cwd, this.context, true)
+      return ((pkg.dependencies && pkg.dependencies[id]) || (pkg.devDependencies && pkg.devDependencies[id]))
+    }
     return this.plugins.some(p => matchesPluginId(id, p.id))
   }
 

@@ -7,7 +7,7 @@ const { log } = require('../util/logger')
 
 let currentView
 
-function createViewsSet () {
+function createViewsSet() {
   // Builtin views
   return [
     /* {
@@ -22,13 +22,13 @@ function createViewsSet () {
       icon: 'extension',
       tooltip: 'org.vue.components.project-nav.tooltips.plugins'
     }, */
-   /*  {
-      id: 'vue-project-dependencies',
-      name: 'project-dependencies',
-      icon: 'collections_bookmark',
-      tooltip: 'org.vue.components.project-nav.tooltips.dependencies',
-      projectTypes: ['vue', 'unknown']
-    }, */
+    /*  {
+       id: 'vue-project-dependencies',
+       name: 'project-dependencies',
+       icon: 'collections_bookmark',
+       tooltip: 'org.vue.components.project-nav.tooltips.dependencies',
+       projectTypes: ['vue', 'unknown']
+     }, */
     /* {
       id: 'vue-project-configurations',
       name: 'project-configurations',
@@ -52,7 +52,7 @@ function createViewsSet () {
 
 const viewsMap = new Map()
 
-function getViews () {
+function getViews() {
   const file = cwd.get()
   let list = viewsMap.get(file)
   if (!list) {
@@ -62,16 +62,16 @@ function getViews () {
   return list
 }
 
-function list (context) {
+function list(context) {
   return getViews()
 }
 
-function findOne (id) {
+function findOne(id) {
   const views = getViews()
   return views.find(r => r.id === id)
 }
 
-async function add ({ view, project }, context) {
+async function add({ view, project }, context) {
   remove(view.id, context)
 
   // Default icon
@@ -90,7 +90,7 @@ async function add ({ view, project }, context) {
   log('View added', view.id)
 }
 
-function remove (id, context) {
+function remove(id, context) {
   const views = getViews()
   const index = views.findIndex(r => r.id === id)
   if (index !== -1) {
@@ -102,7 +102,7 @@ function remove (id, context) {
   }
 }
 
-function update (view, context) {
+function update(view, context) {
   const existingView = findOne(view.id)
   if (existingView) {
     Object.assign(existingView, view)
@@ -112,7 +112,7 @@ function update (view, context) {
   }
 }
 
-function addBadge ({ viewId, badge }, context) {
+function addBadge({ viewId, badge }, context) {
   const view = findOne(viewId)
   if (view) {
     if (!view.badges) view.badges = []
@@ -134,7 +134,7 @@ function addBadge ({ viewId, badge }, context) {
   }
 }
 
-function removeBadge ({ viewId, badgeId }, context) {
+function removeBadge({ viewId, badgeId }, context) {
   const view = findOne(viewId)
   if (view && view.badges) {
     const existingBadge = view.badges.find(b => b.id === badgeId)
@@ -149,7 +149,7 @@ function removeBadge ({ viewId, badgeId }, context) {
   }
 }
 
-function open (id, context) {
+function open(id, context) {
   const view = findOne(id)
   currentView = view
   const plugins = require('./plugins')
