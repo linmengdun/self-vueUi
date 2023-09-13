@@ -2,20 +2,26 @@ const fs = require('fs')
 const path = require('path')
 const LRU = require('lru-cache')
 const { chalk, semver } = require('@vue/cli-shared-utils')
+const execa = require('execa')
 // Connectors
+const git = require('./git')
 const cwd = require('./cwd')
 const folders = require('./folders')
 const progress = require('./progress')
+const projects = require('./projects')
 const logs = require('./logs')
 // Context
 const getContext = require('../context')
 // Utils
-const { isPlugin, resolveModule } = require('@vue/cli-shared-utils')
+const { isPlugin, resolveModule, hasYarn } = require('@vue/cli-shared-utils')
 const { progress: installProgress } = require('@vue/cli/lib/util/executeCommand')
 const PackageManager = require('@vue/cli/lib/util/ProjectPackageManager')
 const { resolveModuleRoot } = require('../util/resolve-path')
 const { notify } = require('../util/notification')
 const { log } = require('../util/logger')
+const { getCommand } = require('../util/command')
+const { uninstallPackage, updatePackage } = require('../util/installPlugin')
+const { installDeps } = require('../util/install-deps')
 
 const PROGRESS_ID = 'dependency-installation'
 const CLI_SERVICE = '@vue/cli-service'
@@ -29,7 +35,9 @@ const metadataCache = new LRU({
 // Local
 let dependencies
 
-function list(file, context) {
+function list(projectId, context) {
+  const project = projects.findOne(projectId, context)
+  const file = project.path
   const pkg = folders.readPackage(file, context)
   dependencies = []
   dependencies = dependencies.concat(
@@ -38,6 +46,7 @@ function list(file, context) {
   dependencies = dependencies.concat(
     findDependencies(pkg.dependencies || {}, 'dependencies', file, context)
   )
+
   return dependencies
 }
 
@@ -74,8 +83,11 @@ function isInstalled({ id, file = cwd.get() }) {
 }
 
 function readPackage({ id, file }, context) {
+  let _getPath = getPath({ id, file })
+
+  if (_getPath === undefined) return {}
   try {
-    return folders.readPackage(getPath({ id, file }), context)
+    return folders.readPackage(_getPath, context) || {}
   } catch (e) {
     console.log(e)
   }
@@ -92,17 +104,28 @@ async function getMetadata(id, context) {
     return metadata
   }
 
-  try {
-    metadata = await (new PackageManager({ context: cwd.get() })).getMetadata(id)
-  } catch (e) {
-    // No connection?
+  if (hasYarn()) {
+    try {
+      const { stdout } = await execa('yarn', ['info', id, '--json'], {
+        cwd: cwd.get()
+      })
+      metadata = JSON.parse(stdout).data
+    } catch (e) {
+      // yarn info failed
+      console.log(e)
+    }
+  }
+
+  if (!metadata) {
+    const res = await getPackageVersion(id)
+    if (res.statusCode === 200) {
+      metadata = res.body
+    }
   }
 
   if (metadata) {
     metadataCache.set(id, metadata)
     return metadata
-  } else {
-    log('Dependencies', chalk.yellow('Can\'t load metadata'), id)
   }
 }
 
@@ -110,7 +133,7 @@ async function getVersion({ id, installed, versionRange, baseDir }, context) {
   let current
 
   // Is local dep
-  const localPath = getLocalPath(id, context)
+  //const localPath = getLocalPath(id, context)
 
   // Read module package.json
   if (installed) {
@@ -138,12 +161,11 @@ async function getVersion({ id, installed, versionRange, baseDir }, context) {
     latest,
     wanted,
     range: versionRange,
-    localPath
+    //localPath
   }
 }
 
 function getLocalPath(id, context) {
-  const projects = require('./projects')
   const projectPkg = folders.readPackage(projects.getCurrent(context).path, context, true)
   const deps = Object.assign(
     {},
@@ -213,14 +235,12 @@ function install({ id, type, range }, context) {
 function uninstall({ id }, context) {
   return progress.wrap(PROGRESS_ID, context, async setProgress => {
     setProgress({
-      status: 'dependency-uninstall',
+      status: 'ddepll',
       args: [id]
     })
 
     const dep = findOne(id, context)
-
-    const pm = new PackageManager({ context: cwd.get() })
-    await pm.remove(id)
+    await uninstallPackage(dep.baseFir, getCommand(cwd.get()), null, id)
 
     logs.add({
       message: `Dependency ${id} uninstalled`,
@@ -228,7 +248,7 @@ function uninstall({ id }, context) {
     }, context)
 
     notify({
-      title: 'Dependency uninstalled',
+      title: `Dependency uninstalled`,
       message: `Dependency ${id} successfully uninstalled`,
       icon: 'done'
     })
@@ -246,9 +266,7 @@ function update({ id }, context) {
 
     const dep = findOne(id, context)
     const { current, wanted } = await getVersion(dep, context)
-
-    const pm = new PackageManager({ context: cwd.get() })
-    await pm.upgrade(id)
+    await updatePackage(dep.baseFir, getCommand(cwd.get()), null, id)
 
     logs.add({
       message: `Dependency ${id} updated from ${current} to ${wanted}`,
@@ -267,42 +285,28 @@ function update({ id }, context) {
   })
 }
 
-function updateAll(context) {
-  return progress.wrap(PROGRESS_ID, context, async setProgress => {
-    const deps = list(cwd.get(), context)
-    const updatedDeps = []
-    for (const dep of deps) {
-      const version = await getVersion(dep, context)
-      if (version.current !== version.wanted) {
-        updatedDeps.push(dep)
-        invalidatePackage({ id: dep.id }, context)
-      }
-    }
+function updateAll(projectId, context) {
+  const { repo, path } = projects.findOne(projectId, context)
 
-    if (!updatedDeps.length) {
-      notify({
-        title: 'No updates available',
-        message: 'No dependency to update in the version ranges declared in package.json',
-        icon: 'done'
-      })
-      return []
-    }
+  return progress.wrap(`${PROGRESS_ID}${projectId}`, context, async setProgress => {
+    await git.pull(repo, path)
+
+    const deps = list(projectId, context)
 
     setProgress({
       status: 'dependencies-update',
-      args: [updatedDeps.length]
+      args: [deps.length]
     })
 
-    const pm = new PackageManager({ context: cwd.get() })
-    await pm.upgrade(updatedDeps.map(p => p.id).join(' '))
+    await installDeps(path, getCommand(path), null)
 
     notify({
-      title: 'Dependencies updated',
-      message: `${updatedDeps.length} dependencies were successfully updated`,
+      title: `Dependencies updated`,
+      message: `${deps.length} dependencies were successfully updated`,
       icon: 'done'
     })
 
-    return updatedDeps
+    return deps
   })
 }
 

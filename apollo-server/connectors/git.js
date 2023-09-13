@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs-extra')
 const parseDiff = require('../util/parse-diff')
 const parseBranch = require('../util/parse-branch')
+const _ = require('lodash')
 // Connectors
 const cwd = require('./cwd')
 const logs = require('./logs')
@@ -72,7 +73,6 @@ async function prune(repo, cwd) {
 
 async function branches(projectId, context) {
   let project
-
   if (typeof projectId === 'object' && projectId.id) {
     project = projectId
   } else {

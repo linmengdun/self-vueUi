@@ -3,7 +3,7 @@
     <VueDropdown :label="projectCurrent ? projectCurrent.name : ''" class="current-project" icon-right="arrow_drop_down"
       button-class="flat round">
       <VueSwitch :value="isFavoriteProject" :icon="isFavoriteProject ? 'star' : 'star_border'" class="extend-left"
-        @input="toggleCurrentFavorite()">
+        @update="toggleCurrentFavorite()">
         {{ $t('org.vue.components.project-select-list-item.tooltips.favorite') }}
       </VueSwitch>
 
@@ -21,8 +21,8 @@
           :label="`origin/${branch.name}`" :icon-left="branch.current ? 'check' : 'uncheck'"
           @click="checkoutBranch(branch)" />
       </template>
-
-      <template v-if="favoriteProjects.length">
+      <!-- 这个是收藏列表数据 -->
+      <!-- <template v-if="favoriteProjects.length">
         <div class="dropdown-separator" />
 
         <div class="section-title">
@@ -31,7 +31,7 @@
 
         <VueDropdownButton v-for="project of favoriteProjects" :key="project.id" :label="project.name" icon-left="star"
           @click="openProject(project)" />
-      </template>
+      </template> -->
 
       <div class="dropdown-separator" />
 
@@ -114,11 +114,11 @@ export default {
 
   methods: {
     async toggleCurrentFavorite() {
-      if (this.currentProjectId) {
+      if (this.projectCurrent) {
         const favorite = db.get('favorite')
         if (this.isFavoriteProject) {
           favorite.remove(id => this.currentProjectId === id).write()
-        } else if (!~favorite.indexOf(this.currentProjectId)) {
+        } else {
           favorite.push(this.currentProjectId).write()
         }
         this.favoriteProjectIds = favorite.cloneDeep().value()

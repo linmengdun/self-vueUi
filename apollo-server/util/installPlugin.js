@@ -220,10 +220,7 @@ exports.installPackage = async function (targetDir, command, cliRegistry, packag
 
 exports.uninstallPackage = async function (targetDir, command, cliRegistry, packageName) {
     checkPackageManagerIsSupported(command)
-
-    const args = packageManagerConfig[command].uninstallPackage
-
-    await addRegistryToArgs(command, args, cliRegistry)
+    const args = [...packageManagerConfig[command].uninstallPackage]
 
     args.push(packageName)
 
@@ -236,7 +233,7 @@ exports.uninstallPackage = async function (targetDir, command, cliRegistry, pack
 exports.updatePackage = async function (targetDir, command, cliRegistry, packageName) {
     checkPackageManagerIsSupported(command)
 
-    const args = packageManagerConfig[command].updatePackage
+    const args = [...packageManagerConfig[command].updatePackage]
 
     await addRegistryToArgs(command, args, cliRegistry)
 

@@ -39,6 +39,7 @@ export default function ({
     },
 
     beforeRouteLeave(to, from, next) {
+      console.log(location);
       if (from.params && Object.keys(from.params).length) {
         lastRoute = from
       }
@@ -53,6 +54,9 @@ export default function ({
 
     methods: {
       replaceBaseRoute() {
+        if (location.pathname === this.$route.path) {
+          return
+        }
         if (baseRoute && !isSameRoute(this.$route, baseRoute, false)) {
           this.$router.replace(baseRoute)
         }

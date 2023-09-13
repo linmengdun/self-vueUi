@@ -9,7 +9,8 @@
       </template>
 
       <ApolloQuery :query="require('../graphql/dependency/dependencies.gql')" :variables="{
-        projectId: currentProjectId
+        projectId: currentProjectId,
+        forceRerender: forceRerender
       }">
         <template slot-scope="{ result: { data, loading } }">
           <VueLoadingIndicator v-if="loading && (!data || !data.dependencies)" class="overlay" />
@@ -21,7 +22,6 @@
                 :filter="item => item.type === type">
                 <template slot-scope="{ list }" v-if="list.length">
                   <div class="cta-text">{{ $t(`org.vue.views.project-dependencies.heading.${type}`) }}</div>
-
                   <ListSort :list="list" :compare="(a, b) => a.id.localeCompare(b.id)">
                     <template slot-scope="{ list }">
                       <ProjectDependencyItem v-for="dependency of list" :key="dependency.id" :dependency="dependency"
@@ -78,6 +78,7 @@ import DEPENDENCIES from '../graphql/dependency/dependencies.gql'
 import DEPENDENCY_INSTALL from '../graphql/dependency/dependencyInstall.gql'
 import DEPENDENCY_UNINSTALL from '../graphql/dependency/dependencyUninstall.gql'
 import DEPENDENCIES_UPDATE from '../graphql/dependency/dependenciesUpdate.gql'
+import { Loading } from 'element-ui'
 
 /* eslint-disable */
 export default {
@@ -91,7 +92,8 @@ export default {
       installType: 'dependencies',
       selectedId: null,
       showUninstallModal: false,
-      search: ''
+      search: '',
+      forceRerender: 0,
     }
   },
 
@@ -103,11 +105,6 @@ export default {
       await this.$apollo.mutate({
         mutation: DEPENDENCIES_UPDATE,
         variables,
-        update: (store, { data: { dependenciesUpdate } }) => {
-          const data = store.readQuery({ query: DEPENDENCIES, variables })
-          data.dependencies = dependenciesUpdate
-          store.writeQuery({ query: DEPENDENCIES, variables, data })
-        }
       })
     },
 
@@ -138,22 +135,20 @@ export default {
     async uninstallPlugin(id) {
       this.showUninstallModal = false
 
+      const loadingInstance = Loading.service({ fullscreen: true, background: 'rgba(0,0,0,0.5)', text: '卸载中...' });
+
       await this.$apollo.mutate({
         mutation: DEPENDENCY_UNINSTALL,
         variables: {
           input: {
             id
           }
-        },
-        update: (store, { data: { dependencyUninstall } }) => {
-          const data = store.readQuery({ query: DEPENDENCIES })
-          const index = data.dependencies.findIndex(d => d.id === dependencyUninstall.id)
-          if (index !== -1) {
-            data.dependencies.splice(index, 1)
-            store.writeQuery({ query: DEPENDENCIES, data })
-          }
         }
       })
+      // 通过这种方式重新触发数据更新，其他update方式不生效，有可能是因为内部被我们重写的缘故
+      this.forceRerender += 1;
+
+      loadingInstance.close();
     }
   }
 }

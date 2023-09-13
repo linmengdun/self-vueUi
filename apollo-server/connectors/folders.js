@@ -13,7 +13,7 @@ const pkgCache = new LRU({
 
 const cwd = require('./cwd')
 
-function isDirectory (file) {
+function isDirectory(file) {
   file = file.replace(/\\/g, path.sep)
   try {
     return fs.stat(file).then((x) => x.isDirectory())
@@ -23,7 +23,7 @@ function isDirectory (file) {
   return false
 }
 
-async function list (base, context) {
+async function list(base, context) {
   let dir = base
   if (isPlatformWindows) {
     if (base.match(/^([A-Z]{1}:)$/)) {
@@ -53,7 +53,7 @@ async function list (base, context) {
   return f.filter((x) => !!x)
 }
 
-async function isHiddenWindows (file) {
+async function isHiddenWindows(file) {
   const windowsFile = file.replace(/\\/g, '\\\\')
   return new Promise((resolve, reject) => {
     winattr.get(windowsFile, (file, error) => {
@@ -65,7 +65,7 @@ async function isHiddenWindows (file) {
   }).then((x) => x.hidden)
 }
 
-async function isHidden (file) {
+async function isHidden(file) {
   try {
     const prefixed = path.basename(file).charAt(0) === hiddenPrefix
     const result = {
@@ -89,30 +89,30 @@ async function isHidden (file) {
   }
 }
 
-function generateFolder (file, context) {
+function generateFolder(file, context) {
   return {
     name: path.basename(file),
     path: file
   }
 }
 
-function getCurrent (args, context) {
+function getCurrent(args, context) {
   const base = cwd.get()
   return generateFolder(base, context)
 }
 
-function open (file, context) {
+function open(file, context) {
   cwd.set(file, context)
   return generateFolder(cwd.get(), context)
 }
 
-function openParent (file, context) {
+function openParent(file, context) {
   const newFile = path.dirname(file)
   cwd.set(newFile, context)
   return generateFolder(cwd.get(), context)
 }
 
-function isPackage (file, context) {
+function isPackage(file, context) {
   try {
     return fs.existsSync(path.join(file, 'package.json'))
   } catch (e) {
@@ -121,7 +121,7 @@ function isPackage (file, context) {
   return false
 }
 
-function readPackage (file, context, force = false) {
+function readPackage(file, context, force = false) {
   if (!force) {
     const cachedValue = pkgCache.get(file)
     if (cachedValue) {
@@ -136,7 +136,7 @@ function readPackage (file, context, force = false) {
   }
 }
 
-function readConfig (file, context, force = false) {
+function readConfig(file, context, force = false) {
   if (!force) {
     const cachedValue = configCache.get(file)
     if (cachedValue) {
@@ -152,7 +152,7 @@ function readConfig (file, context, force = false) {
   return {}
 }
 
-function writePackage ({ file, data }, context) {
+function writePackage({ file, data }, context) {
   fs.outputJsonSync(path.join(file, 'package.json'), data, {
     spaces: 2
   })
@@ -160,12 +160,12 @@ function writePackage ({ file, data }, context) {
   return true
 }
 
-function invalidatePackage (file, context) {
+function invalidatePackage(file, context) {
   pkgCache.del(file)
   return true
 }
 
-function isVueProject (file, context) {
+function isVueProject(file, context) {
   if (!isPackage(file)) return false
 
   try {
@@ -179,18 +179,18 @@ function isVueProject (file, context) {
   return false
 }
 
-function listFavorite (context) {
+function listFavorite(context) {
   return context.db
     .get('foldersFavorite')
     .value()
     .map((file) => generateFolder(file.id, context))
 }
 
-function isFavorite (file, context) {
+function isFavorite(file, context) {
   return !!context.db.get('foldersFavorite').find({ id: file }).size().value()
 }
 
-function setFavorite ({ file, favorite }, context) {
+function setFavorite({ file, favorite }, context) {
   const collection = context.db.get('foldersFavorite')
   if (favorite) {
     collection.push({ id: file }).write()
@@ -200,11 +200,11 @@ function setFavorite ({ file, favorite }, context) {
   return generateFolder(file, context)
 }
 
-async function deleteFolder (file) {
+async function deleteFolder(file) {
   await fs.remove(file)
 }
 
-function createFolder (name, context) {
+function createFolder(name, context) {
   const file = path.join(cwd.get(), name)
   fs.mkdirpSync(file)
   return generateFolder(file, context)

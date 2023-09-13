@@ -1,73 +1,38 @@
 <template>
   <div class="project-dependencies page">
-    <ContentView
-      :title="$t('org.vue.views.project-dependencies.title')"
-      class="limit-width list"
-    >
+    <ContentView :title="$t('org.vue.views.project-dependencies.title')" class="limit-width list">
       <template slot="actions">
-        <VueInput
-          v-model="search"
-          icon-left="search"
-          class="round"
-        />
+        <VueInput v-model="search" icon-left="search" class="round" />
 
-        <VueButton
-          icon-left="add"
-          :label="$t('org.vue.views.project-dependencies.actions.install')"
-          class="primary round"
-          @click="showInstallModal = true"
-        />
+        <VueButton icon-left="add" :label="$t('org.vue.views.project-dependencies.actions.install')" class="primary round"
+          @click="showInstallModal = true" />
 
         <VueDropdown>
-          <VueButton
-            slot="trigger"
-            icon-left="more_vert"
-            class="icon-button flat round"
-          />
+          <VueButton slot="trigger" icon-left="more_vert" class="icon-button flat round" />
 
-          <VueDropdownButton
-            icon-left="file_download"
-            :label="$t('org.vue.views.project-dependencies.actions.update-all')"
-            @click="updateAll()"
-          />
+          <VueDropdownButton icon-left="file_download"
+            :label="$t('org.vue.views.project-dependencies.actions.update-all')" @click="updateAll()" />
         </VueDropdown>
       </template>
 
-      <ApolloQuery
-        :query="require('@/graphql/dependency/dependencies.gql')"
-      >
+      <ApolloQuery :query="require('@/graphql/dependency/dependencies.gql')" :variables="{
+        projectId: currentProjectId
+      }">
         <template slot-scope="{ result: { data, loading } }">
-          <VueLoadingIndicator
-            v-if="loading && (!data || !data.dependencies)"
-            class="overlay"
-          />
+          <VueLoadingIndicator v-if="loading && (!data || !data.dependencies)" class="overlay" />
 
-          <ListFilter
-            v-else-if="data && data.dependencies"
-            :list="data.dependencies"
-            :filter="item => !search || item.id.includes(search)"
-          >
+          <ListFilter v-else-if="data && data.dependencies" :list="data.dependencies"
+            :filter="item => !search || item.id.includes(search)">
             <template slot-scope="{ list }">
-              <ListFilter
-                v-for="type of ['dependencies', 'devDependencies']"
-                :key="type"
-                :list="list"
-                :filter="item => item.type === type"
-              >
+              <ListFilter v-for="type of ['dependencies', 'devDependencies']" :key="type" :list="list"
+                :filter="item => item.type === type">
                 <template slot-scope="{ list }" v-if="list.length">
                   <div class="cta-text">{{ $t(`org.vue.views.project-dependencies.heading.${type}`) }}</div>
 
-                  <ListSort
-                    :list="list"
-                    :compare="(a, b) => a.id.localeCompare(b.id)"
-                  >
+                  <ListSort :list="list" :compare="(a, b) => a.id.localeCompare(b.id)">
                     <template slot-scope="{ list }">
-                      <ProjectDependencyItem
-                        v-for="dependency of list"
-                        :key="dependency.id"
-                        :dependency="dependency"
-                        @uninstall="openConfirmUninstall(dependency.id)"
-                      />
+                      <ProjectDependencyItem v-for="dependency of list" :key="dependency.id" :dependency="dependency"
+                        @uninstall="openConfirmUninstall(dependency.id)" />
                     </template>
                   </ListSort>
                 </template>
@@ -78,72 +43,54 @@
       </ApolloQuery>
     </ContentView>
 
-    <VueModal
-      v-if="showInstallModal"
-      :title="$t('org.vue.views.project-dependencies.install.title')"
-      class="install-modal"
-      @close="showInstallModal = false"
-    >
+    <VueModal v-if="showInstallModal" :title="$t('org.vue.views.project-dependencies.install.title')"
+      class="install-modal" @close="showInstallModal = false">
       <div class="default-body">
         <div class="install-options">
           <VueGroup v-model="installType" class="inline">
-            <VueGroupButton
-              v-for="type of ['dependencies', 'devDependencies']"
-              :key="type"
-              :value="type"
-            >
+            <VueGroupButton v-for="type of ['dependencies', 'devDependencies']" :key="type" :value="type">
               {{ $t(`org.vue.views.project-dependencies.heading.${type}`) }}
             </VueGroupButton>
           </VueGroup>
         </div>
 
-        <NpmPackageSearch
-          filters="NOT computedKeywords:vue-cli-plugin"
-          class="package-search"
-          @close="showInstallModal = false"
-          @install="installPlugin"
-        />
+        <NpmPackageSearch filters="NOT computedKeywords:vue-cli-plugin" class="package-search"
+          @close="showInstallModal = false" @install="installPlugin" />
       </div>
     </VueModal>
 
-    <VueModal
-      v-if="showUninstallModal"
-      :title="$t('org.vue.views.project-dependencies.uninstall.title')"
-      class="small"
-      @close="showUninstallModal = false"
-    >
+    <VueModal v-if="showUninstallModal" :title="$t('org.vue.views.project-dependencies.uninstall.title')" class="small"
+      @close="showUninstallModal = false">
       <div class="default-body">
         {{ $t('org.vue.views.project-dependencies.uninstall.body', { id: selectedId }) }}
       </div>
 
       <div slot="footer" class="actions end">
-        <VueButton
-          :label="$t('org.vue.views.project-dependencies.uninstall.cancel')"
-          class="flat"
-          @click="showUninstallModal = false"
-        />
+        <VueButton :label="$t('org.vue.views.project-dependencies.uninstall.cancel')" class="flat"
+          @click="showUninstallModal = false" />
 
-        <VueButton
-          :label="$t('org.vue.views.project-dependencies.uninstall.uninstall', { id: selectedId })"
-          icon-left="delete_forever"
-          class="danger"
-          @click="uninstallPlugin(selectedId)"
-        />
+        <VueButton :label="$t('org.vue.views.project-dependencies.uninstall.uninstall', { id: selectedId })"
+          icon-left="delete_forever" class="danger" @click="uninstallPlugin(selectedId)" />
       </div>
     </VueModal>
 
-    <ProgressScreen progress-id="dependency-installation"/>
+    <ProgressScreen progress-id="dependency-installation" />
   </div>
 </template>
 
 <script>
+import CurrentProject from '@/mixins/CurrentProject'
+
 import DEPENDENCIES from '@/graphql/dependency/dependencies.gql'
 import DEPENDENCY_INSTALL from '@/graphql/dependency/dependencyInstall.gql'
 import DEPENDENCY_UNINSTALL from '@/graphql/dependency/dependencyUninstall.gql'
 import DEPENDENCIES_UPDATE from '@/graphql/dependency/dependenciesUpdate.gql'
-
+/* eslint-disable */
 export default {
-  data () {
+  mixins: [
+    CurrentProject
+  ],
+  data() {
     return {
       showInstallModal: false,
       installType: 'dependencies',
@@ -154,13 +101,22 @@ export default {
   },
 
   methods: {
-    async updateAll () {
+    async updateAll() {
+      const variables = {
+        projectId: this.currentProjectId
+      }
       await this.$apollo.mutate({
-        mutation: DEPENDENCIES_UPDATE
+        mutation: DEPENDENCIES_UPDATE,
+        variables,
+        update: (store, { data: { dependenciesUpdate } }) => {
+          const data = store.readQuery({ query: DEPENDENCIES, variables })
+          data.dependencies = dependenciesUpdate
+          store.writeQuery({ query: DEPENDENCIES, variables, data })
+        }
       })
     },
 
-    async installPlugin (id) {
+    async installPlugin(id) {
       await this.$apollo.mutate({
         mutation: DEPENDENCY_INSTALL,
         variables: {
@@ -183,12 +139,12 @@ export default {
       this.showInstallModal = false
     },
 
-    openConfirmUninstall (id) {
+    openConfirmUninstall(id) {
       this.selectedId = id
       this.showUninstallModal = true
     },
 
-    async uninstallPlugin (id) {
+    async uninstallPlugin(id) {
       this.showUninstallModal = false
 
       await this.$apollo.mutate({

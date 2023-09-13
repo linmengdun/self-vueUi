@@ -38,7 +38,6 @@ let cache = {
 }
 
 function list(context, root, args) {
-
   const pageNumber = args.skip || 1 // 默认显示第一页
   const pageSize = args.limit || 50 // 默认每页显示 50 条数据
   const startIndex = (pageNumber - 1) * pageSize
@@ -100,9 +99,9 @@ function autoClean(projects, context) {
 }
 
 function getCurrent(id, context) {
-  const currentProject = context.db.get('projects').find({ id }).value()
+  const currentProject = context ? context.db.get('projects').find({ id }).value() : {}
   if (currentProject && !fs.existsSync(currentProject.path)) {
-    log('Project folder not found', currentProject.id, currentProject.path)
+    //log('Project folder not found', currentProject.id, currentProject.path)
     return null
   }
 

@@ -1,8 +1,7 @@
-mutation dependenciesUpdate {
-  dependenciesUpdate {
-    id
-    version {
-      current
-    }
+#import "./dependencyFragment.gql"
+
+mutation dependenciesUpdate ($projectId: ID!) {
+  dependenciesUpdate (projectId: $projectId) {
+    ...dependency
   }
 }

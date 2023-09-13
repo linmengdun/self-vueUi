@@ -1,7 +1,7 @@
 #import "./dependencyFragment.gql"
 
-query dependencies {
-  dependencies {
+query dependencies ($projectId: ID!) {
+  dependencies (projectId: $projectId) {
     ...dependency
   }
 }
