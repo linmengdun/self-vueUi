@@ -39,7 +39,7 @@ export default function ({
     },
 
     beforeRouteLeave(to, from, next) {
-      console.log(location);
+      //console.log(location);
       if (from.params && Object.keys(from.params).length) {
         lastRoute = from
       }

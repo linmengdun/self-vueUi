@@ -15,6 +15,7 @@ const { log } = require('../util/logger')
 const { notify } = require('../util/notification')
 const { terminate } = require('../util/terminate')
 const { parseArgs } = require('../util/parse-args')
+const genLable = require('../util/gen-label')
 
 const MAX_LOGS = 2000
 const VIEW_ID = 'vue-project-tasks'
@@ -47,8 +48,8 @@ function createDefaultTasks({ path }) {
       ],
       prompts: [],
       onBeforeRun({ args, label }) {
-        args.push(`--mode beta`)
-        args.push(`--label ${label}`)
+        /* args.push(`--mode beta`)
+        args.push(`--label ${label}`) */
       }
     },
     {
@@ -137,7 +138,6 @@ async function list({ projectId, api = true } = {}, context) {
   if (list.length < 1) {
     // Get current valid tasks in project `package.json`
     const defaultTasks = createDefaultTasks(project)
-
     tasks.set(projectId, list = defaultTasks.map(task => {
       return {
         id: `${projectId}:${task.name}`,
@@ -256,19 +256,30 @@ function updateViewBadges({ task, data }, context) {
   }
 }
 
-async function run(id, context) {
+async function run({ id }, context) {
   const task = findOne(id, context)
+
   if (task && task.status !== 'running') {
     task._terminating = false
 
     // Answers
-    const answers = prompts.getAnswers()
-    let [command, ...args] = parseArgs(task.command)
+    const answers = prompts.getAnswers(id)
+    const label = genLable()
+
+    let command = task.command
+    let args = []
+    // Process command containing args
+    if (command.indexOf(' ')) {
+      const parts = command.split(/\s+/)
+      command = parts.shift()
+      args = parts
+    }
 
     // Output colors
     // See: https://www.npmjs.com/package/supports-color
     process.env.FORCE_COLOR = 1
 
+    // Task env
     const [projectId] = id.split(':')
     const currentProject = projects.findOne(projectId, context)
     const cwd = currentProject.path
@@ -285,13 +296,6 @@ async function run(id, context) {
 
     // Plugin API
     if (task.onBeforeRun) {
-      if (!answers.$_overrideArgs) {
-        const origPush = args.push.bind(args)
-        args.push = (...items) => {
-          if (items.length && args.indexOf(items[0]) !== -1) return items.length
-          return origPush(...items)
-        }
-      }
       await task.onBeforeRun({
         args,
         label,
@@ -301,29 +305,6 @@ async function run(id, context) {
         project: currentProject
       })
     }
-
-    // Deduplicate arguments
-    /* const dedupedArgs = []
-    for (let i = args.length - 1; i >= 0; i--) {
-      const arg = args[i]
-      if (typeof arg === 'string' && arg.indexOf('--') === 0) {
-        if (dedupedArgs.indexOf(arg) === -1) {
-          dedupedArgs.push(arg)
-        } else {
-          const value = args[i + 1]
-          if (value && value.indexOf('--') !== 0) {
-            dedupedArgs.pop()
-          }
-        }
-      } else {
-        dedupedArgs.push(arg)
-      }
-    }
-    args = dedupedArgs.reverse()
-
-    if (command === 'npm') {
-      args.splice(0, 0, '--')
-    } */
 
     log('Task run', command, args)
 
@@ -353,13 +334,11 @@ async function run(id, context) {
     task.time = Date.now()
 
     // Task env
-    process.env.VUE_CLI_CONTEXT = cwd.get()
-    process.env.VUE_CLI_PROJECT_ID = projects.getCurrent(context).id
     const nodeEnv = process.env.NODE_ENV
     delete process.env.NODE_ENV
 
     const child = execa(command, args, {
-      cwd: cwd.get(),
+      cwd,
       stdio: ['inherit', 'pipe', 'pipe'],
       shell: true
     })
@@ -469,11 +448,11 @@ async function run(id, context) {
           task,
           args,
           child,
-          cwd: cwd.get(),
+          cwd: cwd,
           signal,
           code
         }],
-        file: cwd.get()
+        file: cwd
       }, context)
     }
 
@@ -511,7 +490,7 @@ async function run(id, context) {
       await task.onRun({
         args,
         child,
-        cwd: cwd.get()
+        cwd: cwd
       })
     }
 
@@ -521,9 +500,9 @@ async function run(id, context) {
         task,
         args,
         child,
-        cwd: cwd.get()
+        cwd: cwd
       }],
-      file: cwd.get()
+      file: cwd
     }, context)
   }
   return task
