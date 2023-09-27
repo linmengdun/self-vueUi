@@ -554,7 +554,7 @@
             },
             "name": "库名/组件名 (默认为 package.json 的 name 或 entry 文件名)",
             "watch": "监听变化",
-            "msg": "提交日志（不能为空）"
+            "msg": "提交日志（不能为空，>= 10个字）"
           },
           "eslint": {
             "description": "检查代码及接口配置",

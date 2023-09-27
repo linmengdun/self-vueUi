@@ -206,7 +206,7 @@ export default {
     validParameters() {
       return this.task.prompts.every(
         p => p.id === 'msg'
-          ? (p.value && p.value.length > 12)
+          ? (p.value && p.value.length > 11)
           : p.value !== '""'
       )
     }

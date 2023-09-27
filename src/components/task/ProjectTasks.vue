@@ -1,47 +1,19 @@
 <template>
   <div class="project-tasks page">
-    <ContentView
-      :title="$t('org.vue.views.project-tasks.title')"
-    >
-      <ApolloQuery
-        ref="tasks"
-        :query="require('@/graphql/task/tasks.gql')"
-        class="fill-height"
-      >
+    <ContentView :title="$t('org.vue.views.project-tasks.title')">
+      <ApolloQuery ref="tasks" :query="require('@/graphql/task/tasks.gql')" class="fill-height">
         <template slot-scope="{ result: { data, loading } }">
-          <VueLoadingIndicator
-            v-if="loading && (!data || !data.tasks)"
-            class="overlay"
-          />
+          <VueLoadingIndicator v-if="loading && (!data || !data.tasks)" class="overlay" />
 
-          <NavContent
-            v-else-if="data"
-            :items="generateItems(data.tasks)"
-            class="tasks"
-          >
-            <div
-              slot="before"
-              class="list-header"
-            >
-              <VueInput
-                v-model="search"
-                icon-left="search"
-                class="search round"
-              />
+          <NavContent v-else-if="data" :items="generateItems(data.tasks)" class="tasks">
+            <div slot="before" class="list-header">
+              <VueInput v-model="search" icon-left="search" class="search round" />
 
-              <VueButton
-                v-tooltip="$t('org.vue.views.project-tasks.refresh')"
-                icon-left="refresh"
-                class="icon-button flat"
-                @click="refresh()"
-              />
+              <VueButton v-tooltip="$t('org.vue.views.project-tasks.refresh')" icon-left="refresh"
+                class="icon-button flat" @click="refresh()" />
             </div>
 
-            <TaskItem
-              slot-scope="{ item, selected }"
-              :task="item.task"
-              :selected="selected"
-            />
+            <TaskItem slot-scope="{ item, selected }" :task="item.task" :selected="selected" />
           </NavContent>
         </template>
       </ApolloQuery>
@@ -54,7 +26,7 @@ import RestoreRoute from '@/mixins/RestoreRoute'
 
 import TASK_CHANGED from '@/graphql/task/taskChanged.gql'
 import TASKS from '@/graphql/task/tasks.gql'
-
+/* eslint-disable */
 export default {
   mixins: [
     RestoreRoute({
@@ -62,13 +34,13 @@ export default {
     })
   ],
 
-  metaInfo () {
+  metaInfo() {
     return {
       title: this.$t('org.vue.views.project-tasks.title')
     }
   },
 
-  data () {
+  data() {
     return {
       search: ''
     }
@@ -83,7 +55,7 @@ export default {
   },
 
   bus: {
-    quickOpenProject (project) {
+    quickOpenProject(project) {
       this.$apollo.getClient().writeQuery({
         query: TASKS,
         data: {
@@ -94,7 +66,7 @@ export default {
   },
 
   methods: {
-    generateItems (tasks) {
+    generateItems(tasks) {
       if (!tasks) return []
       return tasks.filter(
         item => !this.search || item.name.includes(this.search)
@@ -111,7 +83,7 @@ export default {
       )
     },
 
-    refresh () {
+    refresh() {
       this.$refs.tasks.$apollo.queries.query.refetch()
     }
   }

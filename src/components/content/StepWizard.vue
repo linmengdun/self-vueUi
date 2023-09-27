@@ -1,10 +1,7 @@
 <template>
-  <div
-    class="step-wizard"
-    :class="{
-      'hide-tabs': hideTabs
-    }"
-  >
+  <div class="step-wizard" :class="{
+    'hide-tabs': hideTabs
+  }">
     <div class="shell">
       <div class="header">
         <div class="content">
@@ -12,23 +9,15 @@
         </div>
       </div>
 
-      <VueTabs
-        ref="tabs"
-        class="main-tabs"
-        group-class="accent"
-        v-bind="$attrs"
-        v-on="$listeners"
-      >
-        <slot
-          :next="next"
-          :previous="previous"
-        />
+      <VueTabs ref="tabs" class="main-tabs" group-class="accent" v-bind="$attrs" v-on="$listeners">
+        <slot :next="next" :previous="previous" />
       </VueTabs>
     </div>
   </div>
 </template>
 
 <script>
+/* eslint-disable */
 export default {
   inheritAttrs: false,
 
@@ -45,11 +34,11 @@ export default {
   },
 
   methods: {
-    next () {
+    next() {
       const tabs = this.$refs.tabs
       tabs.activateChild(tabs.activeChildIndex + 1)
     },
-    previous () {
+    previous() {
       const tabs = this.$refs.tabs
       tabs.activateChild(tabs.activeChildIndex - 1)
     }

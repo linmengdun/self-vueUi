@@ -5,7 +5,7 @@ const { log } = require('../util/logger')
 const promptsMap = new Map()
 const answersMap = new Map()
 
-function generatePromptError (value) {
+function generatePromptError(value) {
   let message
   if (typeof value === 'string') {
     message = value
@@ -17,7 +17,7 @@ function generatePromptError (value) {
   }
 }
 
-async function getEnabled (value) {
+async function getEnabled(value) {
   const type = typeof value
   if (type === 'function') {
     const result = await value(answers)
@@ -29,7 +29,7 @@ async function getEnabled (value) {
   }
 }
 
-function validateInput (prompt, value) {
+function validateInput(prompt, value) {
   const validate = prompt.raw.validate
   if (typeof validate === 'function') {
     return validate(value, answers)
@@ -37,7 +37,7 @@ function validateInput (prompt, value) {
   return true
 }
 
-function getFilteredValue (prompt, value) {
+function getFilteredValue(prompt, value) {
   const filter = prompt.raw.filter
   if (typeof filter === 'function') {
     return filter(value)
@@ -45,7 +45,7 @@ function getFilteredValue (prompt, value) {
   return value
 }
 
-function getTransformedValue (prompt, value) {
+function getTransformedValue(prompt, value) {
   const transformer = prompt.raw.transformer
   if (typeof transformer === 'function') {
     return transformer(value, answers)
@@ -53,7 +53,7 @@ function getTransformedValue (prompt, value) {
   return value
 }
 
-function generatePromptChoice (prompt, data, defaultValue) {
+function generatePromptChoice(prompt, data, defaultValue) {
   return {
     value: JSON.stringify(getTransformedValue(prompt, data.value)),
     name: data.name,
@@ -63,7 +63,7 @@ function generatePromptChoice (prompt, data, defaultValue) {
   }
 }
 
-async function getChoices (prompt) {
+async function getChoices(prompt) {
   const taskId = prompt.taskId
   const data = prompt.raw.choices
   if (!data) {
@@ -85,15 +85,15 @@ async function getChoices (prompt) {
   )
 }
 
-function setAnswer (taskId, answerId, value) {
+function setAnswer(taskId, answerId, value) {
   set(getAnswers(taskId), answerId, value)
 }
 
-function removeAnswer (taskId, answerId) {
+function removeAnswer(taskId, answerId) {
   unset(getAnswers(taskId), answerId)
 }
 
-function generatePrompt (data) {
+function generatePrompt(data) {
   return {
     id: data.name,
     type: data.type,
@@ -114,7 +114,7 @@ function generatePrompt (data) {
   }
 }
 
-async function updatePrompts (taskId) {
+async function updatePrompts(taskId) {
   let prompts = promptsMap.get(taskId)
   if (!prompts) {
     promptsMap.set(taskId, prompts = [])
@@ -150,41 +150,41 @@ async function updatePrompts (taskId) {
 
 // Public API
 
-async function setAnswers (taskId, newAnswers = {}) {
+async function setAnswers(taskId, newAnswers = {}) {
   answersMap.set(taskId, newAnswers)
   await updatePrompts(taskId)
 }
 
-async function changeAnswers (cb) {
+async function changeAnswers(cb) {
   cb(answers)
   await updatePrompts()
 }
 
-function getAnswers (taskId) {
+function getAnswers(taskId) {
   return answersMap.get(taskId) || {}
 }
 
-function getAnswer (taskId, answerId) {
+function getAnswer(taskId, answerId) {
   return get(getAnswers(taskId), answerId)
 }
 
-async function reset (taskId) {
+async function reset(taskId) {
   promptsMap.delete(taskId)
   await setAnswers(taskId)
 }
 
-function list (taskId) {
+function list(taskId) {
   return promptsMap.get(taskId)
 }
 
-function add (taskId, data) {
+function add(taskId, data) {
   const prompts = promptsMap.get(taskId)
   const prompt = generatePrompt(Object.assign(data, { taskId }))
   prompts.push(prompt)
   return prompt
 }
 
-async function start (taskId) {
+async function start(taskId) {
   await updatePrompts(taskId)
 }
 
@@ -193,7 +193,7 @@ async function start (taskId) {
 //   index !== -1 && prompts.splice(index, 1)
 // }
 
-async function setValue ({ id, taskId, value }) {
+async function setValue({ id, taskId, value }) {
   const prompt = findOne(taskId, id)
   if (!prompt) {
     console.warn(`Prompt '${prompt}' not found`)
@@ -215,14 +215,14 @@ async function setValue ({ id, taskId, value }) {
   return prompt
 }
 
-function findOne (taskId, answerId) {
+function findOne(taskId, answerId) {
   const prompts = promptsMap.get(taskId)
   return prompts.find(
     p => p.id === answerId
   )
 }
 
-async function getDefaultValue (prompt) {
+async function getDefaultValue(prompt) {
   let defaultValue = prompt.raw.default
   if (typeof defaultValue === 'function') {
     defaultValue = await defaultValue(answers)
@@ -244,7 +244,7 @@ async function getDefaultValue (prompt) {
   return defaultValue
 }
 
-async function answerPrompt ({ id, taskId, value }, context) {
+async function answerPrompt({ id, taskId, value }, context) {
   await setValue({ id, taskId, value: JSON.parse(value) })
   return list(taskId)
 }

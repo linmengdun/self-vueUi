@@ -51,6 +51,7 @@ export default function ({
           variables: {
             input: {
               id: prompt.id,
+              taskId: prompt.taskId,
               value: JSON.stringify(value)
             }
           },

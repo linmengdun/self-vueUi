@@ -2,134 +2,67 @@
   <div class="project-task-details">
     <template v-if="task">
       <div class="header">
-        <VueIcon icon="assignment" class="task-icon big"/>
+        <VueIcon icon="assignment" class="task-icon big" />
         <div class="name">{{ task.name }}</div>
-        <div
-          class="description"
-          v-tooltip="$t(task.description)"
-        >
+        <div class="description" v-tooltip="$t(task.description)">
           {{ $t(task.description) }}
         </div>
-        <div
-          class="command"
-          v-tooltip="`${$t('org.vue.views.project-task-details.command')}:<br><code>${task.command}</code>`"
-        >
+        <div class="command"
+          v-tooltip="`${$t('org.vue.views.project-task-details.command')}:<br><code>${task.command}</code>`">
           {{ task.command }}
         </div>
       </div>
 
       <div class="actions-bar">
         <div class="main-actions">
-          <VueButton
-            v-if="task.status !== 'running'"
-            icon-left="play_arrow"
-            class="primary"
-            :label="$t('org.vue.views.project-task-details.actions.play')"
-            data-testid="run-task"
-            @click="runTask()"
-          />
+          <VueButton v-if="task.status !== 'running'" icon-left="play_arrow" class="primary"
+            :label="$t('org.vue.views.project-task-details.actions.play')" data-testid="run-task" @click="runTask()" />
 
-          <VueButton
-            v-else
-            icon-left="stop"
-            class="primary"
-            :label="$t('org.vue.views.project-task-details.actions.stop')"
-            data-testid="stop-task"
-            @click="stopTask()"
-          />
+          <VueButton v-else icon-left="stop" class="primary"
+            :label="$t('org.vue.views.project-task-details.actions.stop')" data-testid="stop-task" @click="stopTask()" />
 
-          <VueButton
-            slot="trigger"
-            icon-left="settings"
-            :disabled="task.status === 'running'"
-            :label="$t('org.vue.views.project-task-details.parameters')"
-            @click="showParameters = true"
-          />
+          <VueButton slot="trigger" icon-left="settings" :disabled="task.status === 'running'"
+            :label="$t('org.vue.views.project-task-details.parameters')" @click="showParameters = true" />
 
-          <VueButton
-            v-if="task.link"
-            :href="task.link"
-            target="_blank"
-            icon-left="open_in_new"
-            class="icon-button"
-            v-tooltip="$t('org.vue.views.project-task-details.more-info')"
-          />
+          <VueButton v-if="task.link" :href="task.link" target="_blank" icon-left="open_in_new" class="icon-button"
+            v-tooltip="$t('org.vue.views.project-task-details.more-info')" />
         </div>
 
-        <VueGroup
-          v-if="task.views.length"
-          v-model="currentView"
-          class="views"
-        >
-          <VueGroupButton
-            :label="$t('org.vue.views.project-task-details.output')"
-            icon-left="dvr"
-            value="_output"
-          />
+        <VueGroup v-if="task.views.length" v-model="currentView" class="views">
+          <VueGroupButton :label="$t('org.vue.views.project-task-details.output')" icon-left="dvr" value="_output" />
 
-          <VueGroupButton
-            v-for="view of task.views"
-            :key="view.id"
-            :value="view.id"
-            :icon-left="view.icon"
-            :label="$t(view.label)"
-          />
+          <VueGroupButton v-for="view of task.views" :key="view.id" :value="view.id" :icon-left="view.icon"
+            :label="$t(view.label)" />
         </VueGroup>
       </div>
 
       <div v-if="!defer(3)" class="content placeholder-content">
-        <div class="view card"/>
+        <div class="view card" />
       </div>
 
       <div v-else class="content">
-        <TerminalView
-          ref="terminal"
-          :class="{
-            ghost: currentView !== '_output'
-          }"
-          :key="id"
-          :cols="100"
-          :rows="24"
-          auto-size
-          :options="{
-            scrollback: 5000,
-            disableStdin: true,
-            useFlowControl: true
-          }"
-          :title="$t('org.vue.views.project-task-details.output')"
-          toolbar
-          open-links
-          @clear="clearLogs()"
-        />
+        <TerminalView ref="terminal" :class="{
+          ghost: currentView !== '_output'
+        }" :key="id" :cols="100" :rows="24" auto-size :options="{
+  scrollback: 5000,
+  disableStdin: true,
+  useFlowControl: true
+}" :title="$t('org.vue.views.project-task-details.output')" toolbar open-links @clear="clearLogs()" />
 
-        <ClientAddonComponent
-          v-if="currentView !== '_output'"
-          :name="currentViewComponent"
-          :key="currentView"
-          class="view"
-        />
+        <ClientAddonComponent v-if="currentView !== '_output'" :name="currentViewComponent" :key="currentView"
+          class="view" />
       </div>
     </template>
 
-    <VueModal
-      v-if="showParameters"
-      :title="$t('org.vue.views.project-task-details.parameters')"
-      class="medium anchor"
-      @close="restoreParameters()"
-    >
+    <VueModal v-if="showParameters" :title="$t('org.vue.views.project-task-details.parameters')" class="medium anchor"
+      @close="restoreParameters()">
       <div class="default-body">
-        <PromptsList
-          :prompts="visiblePrompts"
-          @answer="answerPrompt"
-        />
+        <PromptsList :prompts="visiblePrompts" @answer="answerPrompt" />
       </div>
 
       <div slot="footer" class="actions">
-        <VueButton
-          class="primary big"
-          :label="$t('org.vue.views.project-task-details.actions.save')"
-          @click="saveParameters()"
-        />
+        <VueButton class="primary big" :label="$t('org.vue.views.project-task-details.actions.save')"
+          @click="saveParameters()" />
       </div>
     </VueModal>
   </div>
@@ -148,11 +81,11 @@ import TASK_LOG_ADDED from '@/graphql/task/taskLogAdded.gql'
 import TASK_OPEN from '@/graphql/task/taskOpen.gql'
 import TASK_SAVE_PARAMETERS from '@/graphql/task/taskSaveParameters.gql'
 import TASK_RESTORE_PARAMETERS from '@/graphql/task/taskRestoreParameters.gql'
-
+/* eslint-disable */
 export default {
   name: 'ProjectTaskDetails',
 
-  provide () {
+  provide() {
     return {
       TaskDetails: this
     }
@@ -166,7 +99,7 @@ export default {
     Defer()
   ],
 
-  metaInfo () {
+  metaInfo() {
     return {
       title: this.task && `${this.task.name} - ${this.$t('org.vue.views.project-tasks.title')}`
     }
@@ -179,7 +112,7 @@ export default {
     }
   },
 
-  data () {
+  data() {
     return {
       task: null,
       showParameters: false,
@@ -190,33 +123,33 @@ export default {
   apollo: {
     task: {
       query: TASK,
-      variables () {
+      variables() {
         return {
           id: this.id
         }
       },
-      async result ({ data, loading }) {
+      async result({ data, loading }) {
         if (!this.$_init && !loading && data && data.task && data.task.defaultView) {
           this.$_init = true
           await this.$nextTick()
           this.currentView = data.task.defaultView
         }
       },
-      skip () {
+      skip() {
         return !this.defer(2)
       }
     },
 
     taskLogs: {
       query: TASK_LOGS,
-      variables () {
+      variables() {
         return {
           id: this.id
         }
       },
       fetchPolicy: 'network-only',
       manual: true,
-      async result ({ data, loading }) {
+      async result({ data, loading }) {
         if (!loading) {
           await this.$nextTick()
           const terminal = this.$refs.terminal
@@ -225,7 +158,7 @@ export default {
           }
         }
       },
-      skip () {
+      skip() {
         return !this.defer(3)
       }
     },
@@ -233,19 +166,19 @@ export default {
     $subscribe: {
       taskLogAdded: {
         query: TASK_LOG_ADDED,
-        variables () {
+        variables() {
           return {
             id: this.id
           }
         },
-        async result ({ data }) {
+        async result({ data }) {
           if (data.taskLogAdded.taskId === this.id) {
             await this.$nextTick()
             const terminal = this.$refs.terminal
             terminal.addLog(data.taskLogAdded)
           }
         },
-        skip () {
+        skip() {
           return !this.defer(3)
         }
       }
@@ -253,7 +186,7 @@ export default {
   },
 
   computed: {
-    currentViewComponent () {
+    currentViewComponent() {
       if (this.currentView !== '_output') {
         const view = this.task.views.find(
           view => view.id === this.currentView
@@ -268,7 +201,7 @@ export default {
   },
 
   watch: {
-    id () {
+    id() {
       this.showParameters = false
       this.currentView = '_output'
       this.$_init = false
@@ -277,12 +210,12 @@ export default {
     }
   },
 
-  mounted () {
+  mounted() {
     this.open()
   },
 
   methods: {
-    open () {
+    open() {
       this.$apollo.mutate({
         mutation: TASK_OPEN,
         variables: {
@@ -291,7 +224,7 @@ export default {
       })
     },
 
-    runTask () {
+    runTask() {
       this.$apollo.mutate({
         mutation: TASK_RUN,
         variables: {
@@ -300,7 +233,7 @@ export default {
       })
     },
 
-    stopTask () {
+    stopTask() {
       this.$apollo.mutate({
         mutation: TASK_STOP,
         variables: {
@@ -309,7 +242,7 @@ export default {
       })
     },
 
-    clearLogs () {
+    clearLogs() {
       this.$apollo.mutate({
         mutation: TASK_LOGS_CLEAR,
         variables: {
@@ -318,7 +251,7 @@ export default {
       })
     },
 
-    async saveParameters () {
+    async saveParameters() {
       await this.$apollo.mutate({
         mutation: TASK_SAVE_PARAMETERS,
         variables: {
@@ -328,7 +261,7 @@ export default {
       this.showParameters = false
     },
 
-    async restoreParameters () {
+    async restoreParameters() {
       await this.$apollo.mutate({
         mutation: TASK_RESTORE_PARAMETERS,
         variables: {

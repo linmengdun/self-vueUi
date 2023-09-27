@@ -1,26 +1,17 @@
 <template>
   <div class="prompts-list">
     <div class="content">
-      <div
-        v-for="group of groups"
-        :key="group.id"
-        class="group"
-      >
+      <div v-for="group of groups" :key="group.id" class="group">
         <div v-if="group.id" class="group-name">{{ $t(group.id) }}</div>
 
         <template v-for="prompt of group.prompts">
-          <component
-            v-if="prompt.visible"
-            :key="prompt.id"
-            :is="getModule(prompt)"
-            :prompt="prompt"
-            @answer="value => $emit('answer', { prompt, value })"
-          />
+          <component v-if="prompt.visible" :key="prompt.id" :is="getModule(prompt)" :prompt="prompt"
+            @answer="value => $emit('answer', { prompt, value })" />
         </template>
       </div>
 
       <div v-if="!prompts.length" class="vue-ui-empty">
-        <VueIcon icon="check_circle" class="empty-icon"/>
+        <VueIcon icon="check_circle" class="empty-icon" />
         <span>{{ $t('org.vue.components.prompts-list.empty') }}</span>
       </div>
     </div>
@@ -28,6 +19,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 const types = {
   rawlist: 'list',
   password: 'input'
@@ -42,7 +34,7 @@ export default {
   },
 
   computed: {
-    groups () {
+    groups() {
       const groupMap = {}
       const groups = []
       this.prompts.forEach(prompt => {
@@ -61,7 +53,7 @@ export default {
   },
 
   methods: {
-    getModule (prompt) {
+    getModule(prompt) {
       let type = prompt.type
       if (types[type]) {
         type = types[type]

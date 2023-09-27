@@ -77,9 +77,9 @@ function createDefaultTasks({ path }) {
         },
       ],
       async onBeforeRun({ args, answers, project, taskId, context }) {
-        args.push(`--mode production`)
+        //args.push(`--mode production`)
         args.push(`--message ${answers.msg}`)
-        args.push(`--contributor ${context.auth['openid.sreg.fullname']}`)
+        //args.push(`--contributor ${context.auth['openid.sreg.fullname']}`)
 
         //检查当前的分支，针对Git
         git.branches(project).then(branches => {
@@ -104,7 +104,7 @@ function createDefaultTasks({ path }) {
         })
       },
       // 进行代码检查
-      async onExit({ code, answers, context: { auth }, project }) {
+      /* async onExit({ code, answers, context: { auth }, project }) {
         if (code === 0) {
           await execa('python', [
             CODECHECKER_CMD,
@@ -116,7 +116,7 @@ function createDefaultTasks({ path }) {
             `--config_file ${CODECHECKER_DIR}config.json`
           ], { shell: true })
         }
-      }
+      } */
     }
   ]
 }

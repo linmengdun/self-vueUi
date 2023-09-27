@@ -1,9 +1,9 @@
 <template>
   <div class="project-tasks page">
     <ContentView :title="$t('org.vue.views.project-tasks.title')">
-      <template slot="actions">
+      <!-- <template slot="actions">
         <VueInput v-model="search" icon-left="search" class="round" />
-      </template>
+      </template> -->
 
       <ApolloQuery :query="require('../graphql/task/tasks.gql')" class="fill-height" :variables="{
         projectId: currentProjectId
