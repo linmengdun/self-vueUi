@@ -28,5 +28,9 @@ module.exports = {
       }
     }
   },
-  parallel: !process.env.CIRCLECI
+  parallel: !process.env.CIRCLECI,
+  devServer: {
+    host: '101.33.215.164',
+    port: 8081
+  }
 }

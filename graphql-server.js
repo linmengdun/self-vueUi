@@ -164,11 +164,11 @@ module.exports = (options, cb = null) => {
   server.installSubscriptionHandlers(httpServer)
 
   httpServer.listen({
-    host: options.host || 'localhost',
+    host: options.host || '101.33.215.164',
     port: options.port
   }, () => {
     if (!options.quiet) {
-      console.log(`✔️  GraphQL Server is running on ${chalk.cyan(`http://localhost:${options.port}${options.graphqlPath}`)}`)
+      console.log(`✔️  GraphQL Server is running on ${chalk.cyan(`http://101.33.215.164:${options.port}${options.graphqlPath}`)}`)
       if (process.env.NODE_ENV !== 'production' && !process.env.VUE_CLI_API_MODE) {
         console.log(`✔️  Type ${chalk.cyan('rs')} to restart the server`)
       }

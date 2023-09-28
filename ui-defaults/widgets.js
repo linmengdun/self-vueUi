@@ -4,7 +4,7 @@ module.exports = api => {
   if (process.env.VUE_APP_CLI_UI_DEV) {
     api.addClientAddon({
       id: 'org.vue.widgets.client-addon.dev',
-      url: 'http://localhost:8097/index.js'
+      url: 'http://101.33.215.164:8097/index.js'
     })
   } else {
     api.addClientAddon({

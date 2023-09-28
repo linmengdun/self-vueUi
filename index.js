@@ -2,7 +2,7 @@ exports.clientAddonConfig = function ({ id, port = 8042 }) {
   return {
     publicPath: process.env.NODE_ENV === 'production'
       ? `/_addon/${id}`
-      : `http://localhost:${port}/`,
+      : `http://101.33.215.164:${port}/`,
     configureWebpack: {
       output: {
         // Important
