@@ -1,3 +1,7 @@
+/* eslint-disable */
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+
 import './plugins'
 import './register-components'
 
@@ -29,7 +33,6 @@ const app = new Vue({
   ...App
 })
 
-/* eslint-disable */
 async function start() {
   app.$mount('#app')
 

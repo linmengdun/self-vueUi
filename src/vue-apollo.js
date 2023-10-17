@@ -15,12 +15,12 @@ import { getForcedTheme } from './util/theme'
 // Install the vue plugin
 Vue.use(VueApollo)
 /* eslint-disable */
-let endpoint = process.env.VUE_APP_CLI_UI_URL
-if (typeof endpoint === 'undefined') {
+let endpoint = `ws://vue-cicd.ewan.cn/graphql`
+/* if (typeof endpoint === 'undefined') {
   endpoint = `ws://localhost:${process.env.VUE_APP_GRAPHQL_PORT}/graphql`
 } else if (endpoint === '') {
-  endpoint = window.location.origin.replace('http', 'ws') + '/graphql'
-}
+  endpoint = `ws://vue-cicd.ewan.cn/graphql`
+} */
 
 // Config
 const options = {
@@ -103,14 +103,14 @@ function setConnected(value) {
   })
 }
 
-wsClient.on('connected', () => setConnected(true))
+/* wsClient.on('connected', () => setConnected(true))
 wsClient.on('reconnected', async () => {
   await resetApollo()
   setConnected(true)
-})
+}) */
 // Offline
-wsClient.on('disconnected', () => setConnected(false))
-wsClient.on('error', () => setConnected(false))
+/* wsClient.on('disconnected', () => setConnected(false))
+wsClient.on('error', () => setConnected(false)) */
 
 /* Dark mode */
 

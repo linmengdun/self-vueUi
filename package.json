@@ -8,7 +8,7 @@
   },
   "scripts": {
     "serve": "cross-env VUE_APP_CLI_UI_URL=ws://localhost:4030/graphql VUE_APP_GRAPHQL_PORT=4030 vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "cross-env NODE_ENV=development vue-cli-service build",
     "lint": "vue-cli-service lint src apollo-server",
     "apollo": "cross-env VUE_APP_CLI_UI_DEV=true VUE_APP_CLI_UI_DEBUG=true VUE_APP_GRAPHQL_PORT=4030 vue-cli-service apollo:dev",
     "apollo:debug": "cross-env VUE_CLI_DEBUG=true yarn run apollo",
@@ -36,6 +36,8 @@
   ],
   "dependencies": {
     "@akryum/winattr": "^3.0.0",
+    "@babel/plugin-transform-runtime": "^7.23.2",
+    "@babel/preset-env": "^7.23.2",
     "@vue/cli": "^5.0.8",
     "@vue/cli-shared-utils": "^5.0.1",
     "antd": "^5.9.0",
@@ -67,6 +69,7 @@
     "parse-git-config": "^3.0.0",
     "portfinder": "^1.0.26",
     "prismjs": "^1.23.0",
+    "regenerator-runtime": "^0.14.0",
     "rss-parser": "^3.11.0",
     "shortid": "^2.2.15",
     "typescript": "~4.5.5"
@@ -85,7 +88,7 @@
     "apollo-client": "^2.6.10",
     "apollo-link": "^1.2.14",
     "chokidar": "^3.5.2",
-    "core-js": "^3.8.3",
+    "core-js": "^3.33.0",
     "cross-env": "^7.0.3",
     "date-fns": "^2.17.0",
     "debug": "^4.1.0",

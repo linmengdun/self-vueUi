@@ -6,7 +6,7 @@ module.exports = {
             args: 'serve',
             env: {
                 NODE_ENV: 'development',
-                VUE_APP_CLI_UI_URL: 'ws://localhost:4030/graphql',
+                VUE_APP_CLI_UI_URL: 'ws://vue-cicd.ewan.cn/graphql',
                 VUE_APP_GRAPHQL_PORT: '4030'
             }
         },

@@ -36,3 +36,43 @@ yarn run test:e2e
 
 This will open a new [Cypress](https://www.cypress.io/) window.
 You can now run all or specific integration tests.
+
+
+## nginx 配置
+```
+server
+  {
+    listen      80;
+    server_name  vue-cicd.xxx.cn;
+    index index.html index.htm;
+    root  /data/apps/cicd-vue-ui/dist;
+
+    ssi on;
+    ssi_silent_errors on;
+
+  #  location / {
+#       proxy_pass http://127.0.0.1:8080;
+ #   }
+    location /graphql {
+        proxy_pass http://localhost:4030;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+    }
+    #location / {
+    #    proxy_pass http://127.0.0.1:8080;
+    #    proxy_http_version 1.1;
+    #    proxy_set_header Upgrade $http_upgrade;
+    #    proxy_set_header Connection "Upgrade";
+    #}
+
+    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|css)$
+    {
+      expires      1h;
+    }
+
+    access_log /data/logs/nginx/cli.ewan.cn.log  weblog;
+
+  }
+
+```
