@@ -15,7 +15,7 @@ import { getForcedTheme } from './util/theme'
 // Install the vue plugin
 Vue.use(VueApollo)
 /* eslint-disable */
-let endpoint = `ws://vue-cicd.ewan.cn/graphql`
+let endpoint = `ws://localhost:4030/graphql`
 /* if (typeof endpoint === 'undefined') {
   endpoint = `ws://localhost:${process.env.VUE_APP_GRAPHQL_PORT}/graphql`
 } else if (endpoint === '') {
