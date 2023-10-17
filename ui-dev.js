@@ -10,7 +10,7 @@ module.exports = api => {
     id: 'org.vue.webpack.views.test',
     name: 'org.vue.webpack.routes.test',
     // icon: 'pets',
-    icon: '/public/webpack-logo.png',
+    icon: '/webpack-logo.png',
     tooltip: 'Test view from webpack addon'
   })
 

@@ -29,7 +29,7 @@ function createDefaultTasks({ path }) {
       name: 'deploy-beta',
       command: 'ewan beta',
       defaultView: 'org.vue.webpack.views.dashboard',
-      icon: '/public/webpack-logo.png',
+      icon: '/webpack-logo.png',
       description: 'org.vue.vue-webpack.tasks.beta.description',
       needHistory: true,
       views: [
@@ -56,7 +56,7 @@ function createDefaultTasks({ path }) {
       name: 'deploy-prod',
       command: 'ewan release',
       defaultView: 'org.vue.webpack.views.dashboard',
-      icon: '/public/webpack-logo.png',
+      icon: '/webpack-logo.png',
       description: 'org.vue.vue-webpack.tasks.build.description',
       needHistory: true,
       views: [],

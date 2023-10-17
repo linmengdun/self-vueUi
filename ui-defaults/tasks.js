@@ -164,7 +164,7 @@ module.exports = api => {
     match: /vue-cli-service serve(\s+--\S+(\s+\S+)?)*$/,
     description: 'org.vue.vue-webpack.tasks.serve.description',
     link: 'https://cli.vuejs.org/guide/cli-service.html#vue-cli-service-serve',
-    icon: '/public/webpack-logo.png',
+    icon: '/webpack-logo.png',
     prompts: [
       {
         name: 'open',
@@ -242,7 +242,7 @@ module.exports = api => {
     match: /vue-cli-service build(\s+--\S+(\s+\S+)?)*$/,
     description: 'org.vue.vue-webpack.tasks.build.description',
     link: 'https://cli.vuejs.org/guide/cli-service.html#vue-cli-service-build',
-    icon: '/public/webpack-logo.png',
+    icon: '/webpack-logo.png',
     prompts: [
       {
         name: 'modern',

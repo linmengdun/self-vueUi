@@ -51,8 +51,11 @@ server
     ssi_silent_errors on;
 
   #  location / {
-#       proxy_pass http://127.0.0.1:8080;
+#	proxy_pass http://127.0.0.1:8080;
  #   }
+    location / {
+      try_files $uri $uri/ /index.html;
+    }
     location /graphql {
         proxy_pass http://localhost:4030;
         proxy_http_version 1.1;
@@ -72,7 +75,8 @@ server
     }
 
     access_log /data/logs/nginx/cli.ewan.cn.log  weblog;
-
+            
   }
+
 
 ```
