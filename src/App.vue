@@ -6,7 +6,7 @@
     </div>
     <VueLoadingIndicator v-else class="app-init-loading overlay big accent" />
 
-    <StatusBar />
+    <StatusBar v-if="$route.name !== 'login'" />
     <ClientAddonLoader />
     <LocaleLoader />
   </div>

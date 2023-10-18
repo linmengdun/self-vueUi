@@ -22,6 +22,8 @@ import FileDiffView from './components/file-diff/FileDiffView.vue'
 /* import About from './components/app/About.vue' */
 import NotFound from './views/NotFound.vue'
 
+import Login from './components/login/index.vue'
+
 import PROJECT_CURRENT from './graphql/project/projectCurrent.gql'
 import CURRENT_PROJECT_ID_SET from './graphql/project/currentProjectIdSet.gql'
 
@@ -118,6 +120,11 @@ const router = new Router({
       path: '/home',
       name: 'home',
       redirect: { name: 'project-home' }
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     },
     {
       path: '*',
